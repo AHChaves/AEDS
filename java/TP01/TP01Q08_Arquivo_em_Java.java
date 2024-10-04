@@ -50,7 +50,11 @@ public class TP01Q08_Arquivo_em_Java {
             for (int i = 0; i < n; i++) {
                 file.seek(fileLength - (i + 1) * 8);
                 double number = file.readDouble();
-                System.out.println(number);
+                if (number % 1 == 0) {
+                    System.out.println((int) number);
+                } else {
+                    System.out.println(number);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
