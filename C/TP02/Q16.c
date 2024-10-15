@@ -2,7 +2,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <time.h>
 
 #define TAM_STRING (50 + 1)
 #define TAM_LINHA (1000 + 1)
@@ -283,44 +282,27 @@ Pokemon ler(char *linha)
     return poke;
 }
 
-int numeroComparacoes = 0, numero_movimentacoes = 0;
-
-void swap(Pokemon *a, Pokemon *b)
+void insercao(Pokemon *poke, int n, int k)
 {
-    Pokemon temp = *a;
-    *a = *b;
-    *b = temp;
-}
-
-void bolha(Pokemon *poke, int n)
-{
-    int i, j;
-    for (i = 0; i < n; i++)
+    Pokemon tmp;
+    int j;
+    for (int i = 1; i < n; i++)
     {
-        for (j = i; j < n; j++)
+        tmp = poke[i];
+        j = (i < k) ? i - 1 : k - 1;
+        while ((j >= 0) && (strcmp(poke[j].captureDate, tmp.captureDate) > 0))
         {
-            if (poke[i].id > poke[j].id)
-            {
-                swap(&poke[i], &poke[j]);
-                numero_movimentacoes += 3;
-            }
-            numeroComparacoes++;
+            poke[j + 1] = poke[j];
+            j--;
         }
+        poke[j + 1] = tmp;
     }
-}
-
-void logarInformacoes(const int matricula, int comparacoes, int movimentacoes, double tempo)
-{
-    FILE *arquivo = fopen("matrícula_bolha.txt", "w");
-
-    fprintf(arquivo, "%d\t%d\t%d\t%lf", matricula, comparacoes, movimentacoes, tempo);
-    fclose(arquivo);
 }
 
 int main()
 {
     // FILE *arq = fopen("pokemon.csv", "r");
-    FILE *arq = fopen("/tmp/pokemon.csv", "r");
+    FILE * arq = fopen("/tmp/pokemon.csv", "r");
 
     char linha[TAM_LINHA];
     int n_Pokemons = 801;
@@ -351,16 +333,10 @@ int main()
             pokeSelect = (Pokemon *)realloc(pokeSelect, sizeof(Pokemon) * (lista_tam + 1));
         }
     }
-    clock_t inicio = clock();
-    bolha(pokeSelect, lista_tam);
-    clock_t fim = clock(); 
 
-    double tempoExecucao = (double)(fim - inicio) / CLOCKS_PER_SEC; 
+    insercao(pokeSelect, lista_tam, 10);
 
-    logarInformacoes(1528647, numeroComparacoes, numero_movimentacoes, tempoExecucao);
-
-
-    for (int i = 0; i < lista_tam; i++)
+    for (int i = 0; i < 10; i++)
     {
         imprimir(pokeSelect[i]);
     }

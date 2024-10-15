@@ -1,13 +1,15 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-class PokemonQ3{
+class PokemonQ3 {
     private int id;
     private int generation;
     private String name;
@@ -20,7 +22,7 @@ class PokemonQ3{
     private boolean isLegendary;
     private LocalDate captureDate;
 
-    public PokemonQ3(){
+    public PokemonQ3() {
         this.id = 0;
         this.generation = 0;
         this.name = "";
@@ -31,7 +33,9 @@ class PokemonQ3{
         this.isLegendary = false;
         this.captureDate.of(0, 1, 1);
     }
-    public PokemonQ3(int id, int generation, String name, String description, List<String> type, List<String> abilities, double weight, double height, int captureRate, boolean isLegendary, LocalDate captureDate){
+
+    public PokemonQ3(int id, int generation, String name, String description, List<String> type, List<String> abilities,
+            double weight, double height, int captureRate, boolean isLegendary, LocalDate captureDate) {
         this.id = id;
         this.generation = generation;
         this.name = name;
@@ -43,71 +47,131 @@ class PokemonQ3{
         this.captureRate = captureRate;
         this.isLegendary = isLegendary;
         this.captureDate = captureDate;
-        
+
     }
-    
-    public int getId() {return this.id;}
-    public void setId(int id) {this.id = id;}
-    public int getGeneration() {return this.generation;}
-    public void setGeneration(int generation) {this.generation = generation;}
-    public String getName() {return this.name;}
-    public void setName(String name) {this.name = name;}
-    public String getDescription() {return this.description;}
-    public void setDescription(String description) {this.description = description;}
-    public List<String> getType() {return this.type;}
-    public void setType(List<String> type) {this.type = type;}
-    public List<String> getAbilities() {return this.abilities;}
-    public void setAbilities(List<String> abilities) {this.abilities = abilities;}
-    public double getWeight() {return this.weight;}
-    public void setWeight(double weight) {this.weight = weight;}
-    public double getHeight() {return this.height;}
-    public void setHeight(double height) {this.height = height;}
-    public int getCaptureRate() {return this.captureRate;}
-    public void setCaptureRate(int captureRate) {this.captureRate = captureRate;}
-    public boolean getIsLegendary() {return this.isLegendary;}
-    public void setIsLegendary(boolean isLegendary) {this.isLegendary = isLegendary;}
-    public LocalDate getCaptureDate() {return this.captureDate;}
-    public void setCaptureDate(LocalDate captureDate) {this.captureDate = captureDate;}
 
+    public int getId() {
+        return this.id;
+    }
 
+    public void setId(int id) {
+        this.id = id;
+    }
 
-    public void ler(String linha){
+    public int getGeneration() {
+        return this.generation;
+    }
+
+    public void setGeneration(int generation) {
+        this.generation = generation;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return this.description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public List<String> getType() {
+        return this.type;
+    }
+
+    public void setType(List<String> type) {
+        this.type = type;
+    }
+
+    public List<String> getAbilities() {
+        return this.abilities;
+    }
+
+    public void setAbilities(List<String> abilities) {
+        this.abilities = abilities;
+    }
+
+    public double getWeight() {
+        return this.weight;
+    }
+
+    public void setWeight(double weight) {
+        this.weight = weight;
+    }
+
+    public double getHeight() {
+        return this.height;
+    }
+
+    public void setHeight(double height) {
+        this.height = height;
+    }
+
+    public int getCaptureRate() {
+        return this.captureRate;
+    }
+
+    public void setCaptureRate(int captureRate) {
+        this.captureRate = captureRate;
+    }
+
+    public boolean getIsLegendary() {
+        return this.isLegendary;
+    }
+
+    public void setIsLegendary(boolean isLegendary) {
+        this.isLegendary = isLegendary;
+    }
+
+    public LocalDate getCaptureDate() {
+        return this.captureDate;
+    }
+
+    public void setCaptureDate(LocalDate captureDate) {
+        this.captureDate = captureDate;
+    }
+
+    public void ler(String linha) {
         String[] data = new String[12];
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
         int tmp = 0;
         int j = 0;
-        for(int i = 0; i < linha.length(); i++) {
-            if(linha.charAt(i) == '"'){
+        for (int i = 0; i < linha.length(); i++) {
+            if (linha.charAt(i) == '"') {
                 List<String> aux = new ArrayList<>();
-                i+=2;
+                i += 2;
                 tmp = i;
-                while(linha.charAt(i) != '"'){
-                    if(linha.charAt(i) == ',' || linha.charAt(i) == ']') {
+                while (linha.charAt(i) != '"') {
+                    if (linha.charAt(i) == ',' || linha.charAt(i) == ']') {
                         aux.add(linha.substring(tmp, i));
                         tmp = i + 1;
-        	        }
+                    }
                     i++;
                 }
-                tmp = i+1;
+                tmp = i + 1;
                 setAbilities(aux);
-            }
-        	else if(linha.charAt(i) == ',')  {
+            } else if (linha.charAt(i) == ',') {
                 String l = linha.substring(tmp, i);
-        		if(l == ""){
+                if (l == "") {
                     data[j] = "0";
-                }
-                else{
+                } else {
                     data[j] = l;
                 }
                 tmp = i + 1;
                 j++;
-        	}
-            else if(linha.length() - i == 1){
-                data[j] = linha.substring(tmp, i+1);
+            } else if (linha.length() - i == 1) {
+                data[j] = linha.substring(tmp, i + 1);
 
                 tmp = i + 1;
-        		j++;
+                j++;
             }
         }
 
@@ -115,10 +179,10 @@ class PokemonQ3{
         setGeneration(Integer.parseInt(data[1]));
         setName(data[2]);
         setDescription(data[3]);
-        
+
         List<String> aux = new ArrayList<>();
         aux.add(data[4]);
-        if(data[5] != "0") 
+        if (data[5] != "0")
             aux.add(data[5]);
         setType(aux);
 
@@ -130,25 +194,26 @@ class PokemonQ3{
 
     }
 
-    public void imprimir(){
+    public void imprimir() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-        System.out.print("[#"+ this.id + " -> " + this.name + ": " + this.description + " - [");
-        for(int i = 0; i < this.type.size(); i++){
-            if(i > 0) 
+        System.out.print("[#" + this.id + " -> " + this.name + ": " + this.description + " - [");
+        for (int i = 0; i < this.type.size(); i++) {
+            if (i > 0)
                 System.out.print(", ");
             System.out.print("'" + this.type.get(i) + "'");
         }
         System.out.print("] - [");
-        for(int i = 0; i < this.abilities.size(); i++){
-            if(i > 0) 
+        for (int i = 0; i < this.abilities.size(); i++) {
+            if (i > 0)
                 System.out.print(",");
             System.out.print(this.abilities.get(i));
         }
-        System.out.println("] - " + this.weight + "kg - " + this.height + "m - " + this.captureRate + "% - " + this.isLegendary + " - " + this.generation + " gen] - " + this.captureDate.format(formatter));
+        System.out.println("] - " + this.weight + "kg - " + this.height + "m - " + this.captureRate + "% - "
+                + this.isLegendary + " - " + this.generation + " gen] - " + this.captureDate.format(formatter));
     }
 
-    public PokemonQ3 clone(){
+    public PokemonQ3 clone() {
         PokemonQ3 pokemon = new PokemonQ3();
         pokemon.id = this.id;
         pokemon.generation = this.generation;
@@ -167,29 +232,41 @@ class PokemonQ3{
 
 public class Q3 {
 
-    public static PokemonQ3 buscarPorId(List<PokemonQ3> lista, int id){
+    private static int numComparacoes = 0;
+
+    public static PokemonQ3 buscarPorId(List<PokemonQ3> lista, int id) {
         PokemonQ3 pk = new PokemonQ3();
-        for(PokemonQ3 j : lista){
-            if(j.getId() == id){
+        for (PokemonQ3 j : lista) {
+            if (j.getId() == id) {
                 pk = j.clone();
             }
         }
         return pk;
     }
 
-    public static boolean pesqSeq(List<PokemonQ3> poke, String name){
+    public static boolean pesqSeq(List<PokemonQ3> poke, String name) {
         boolean resp = false;
         int n = poke.size();
 
-        for(int i = 0; i < n; i++){
+        for (int i = 0; i < n; i++) {
             String pokeName = poke.get(i).getName();
-            if(pokeName.equals(name)){
+            numComparacoes++;
+            if (pokeName.equals(name)) {
                 resp = true;
                 i = n;
             }
         }
         return resp;
-   }
+    }
+
+    public static void registrarLog(int matricula, long tempoExecucao) {
+        String nomeArquivo = "matricula_sequencial.txt";
+        try (FileWriter writer = new FileWriter(nomeArquivo, true)) {
+            writer.write(matricula + "\t" + tempoExecucao + "\t" + numComparacoes + "\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void main(String[] args) {
 
@@ -200,50 +277,54 @@ public class Q3 {
         List<PokemonQ3> listaPokemon = new ArrayList<>();
         List<PokemonQ3> listaImpressao = new ArrayList<>();
         boolean isFim = false;
-        
-        try(BufferedReader br = new BufferedReader(new FileReader(path))){
+
+        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
 
             String linha = br.readLine();
 
-            while((linha = br.readLine()) != null){
+            while ((linha = br.readLine()) != null) {
                 // System.out.println(linha);
                 PokemonQ3 j = new PokemonQ3();
                 j.ler(linha);
                 listaPokemon.add(j);
             }
-        }catch(IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
-        while(!isFim){
+        while (!isFim) {
             entrada = scanner.nextLine();
 
-            if(entrada.equals("FIM"))
+            if (entrada.equals("FIM"))
                 isFim = true;
 
-            if(!isFim){
+            if (!isFim) {
                 int id = Integer.parseInt(entrada);
                 listaImpressao.add(buscarPorId(listaPokemon, id));
-                // PokemonQ3 jogadorEncontrado = buscarPorId(listaPokemon, id);
-                // jogadorEncontrado.imprimir();
-                // jogadorEncontrado.imprimir();
             }
         }
 
         // entrada = scanner.nextLine();
         isFim = false;
 
-        while(!isFim){
+        long inicioB = System.nanoTime();
+        while (!isFim) {
             entrada = scanner.nextLine();
-            if(entrada.equals("FIM"))
+            if (entrada.equals("FIM"))
                 isFim = true;
 
-            if(!isFim){
+            if (!isFim) {
+
                 String resp = (pesqSeq(listaImpressao, entrada)) ? "SIM" : "NAO";
                 System.out.println(resp);
             }
 
-        } 
+        }
+        long fimB = System.nanoTime();
+
+        long tempoExecucao = Duration.ofNanos(fimB - inicioB).toMillis();
+
+        registrarLog(1528647, tempoExecucao);
 
         scanner.close();
     }

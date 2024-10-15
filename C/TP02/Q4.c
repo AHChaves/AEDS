@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <time.h>
 
 #define TAM_STRING (50 + 1)
 #define TAM_LINHA (1000 + 1)
@@ -283,6 +284,7 @@ Pokemon ler(char *linha)
     return poke;
 }
 
+int numeroComparacoes = 0;
 
 bool pesquisaBinaria(Pokemon *arr, char *nome, int tam)
 {
@@ -294,6 +296,7 @@ bool pesquisaBinaria(Pokemon *arr, char *nome, int tam)
     {
         meio = (dir + esq) / 2;
         int comparacao = strcmp(arr[meio].name, nome);
+        numeroComparacoes++;
 
         if (comparacao == 0)
         {
@@ -310,6 +313,14 @@ bool pesquisaBinaria(Pokemon *arr, char *nome, int tam)
         }
     }
     return achou;
+}
+
+void logarInformacoes(const int matricula, int comparacoes, double tempo)
+{
+    FILE *arquivo = fopen("matrícula_binaria.txt", "w");
+
+    fprintf(arquivo, "%d\t%d\t%lf", matricula, comparacoes, tempo);
+    fclose(arquivo);
 }
 
 int main()
@@ -330,7 +341,6 @@ int main()
     {
 
         poke[poke_index] = ler(linha);
-        // imprimir(poke[poke_index]);
         poke_index++;
     }
 
@@ -353,6 +363,7 @@ int main()
 
     strcpy(entrada, "entrada");
 
+    clock_t inicio = clock();
     while (strcmp(entrada, "FIM") != 0)
     {
         scanf("%s", entrada);
@@ -363,6 +374,11 @@ int main()
             printf("%s\n", result);
         }
     }
+    clock_t fim = clock(); 
+
+    double tempoExecucao = (double)(fim - inicio) / CLOCKS_PER_SEC; 
+
+    logarInformacoes(1528647, numeroComparacoes, tempoExecucao);
 
     free(poke);
     fclose(arq);

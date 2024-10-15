@@ -2,7 +2,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <time.h>
 
 #define TAM_STRING (50 + 1)
 #define TAM_LINHA (1000 + 1)
@@ -283,44 +282,69 @@ Pokemon ler(char *linha)
     return poke;
 }
 
-int numeroComparacoes = 0, numero_movimentacoes = 0;
 
-void swap(Pokemon *a, Pokemon *b)
-{
-    Pokemon temp = *a;
-    *a = *b;
-    *b = temp;
+int getMaiorFilho(Pokemon *array, int i, int tamHeap) {
+    int filho;
+    if (2 * i == tamHeap || array[2 * i].height > array[2 * i + 1].height) {
+        filho = 2 * i;
+    } else {
+        filho = 2 * i + 1;
+    }
+    return filho;
 }
 
-void bolha(Pokemon *poke, int n)
-{
-    int i, j;
-    for (i = 0; i < n; i++)
-    {
-        for (j = i; j < n; j++)
-        {
-            if (poke[i].id > poke[j].id)
-            {
-                swap(&poke[i], &poke[j]);
-                numero_movimentacoes += 3;
-            }
-            numeroComparacoes++;
+bool compararPokemon(Pokemon a, Pokemon b) {
+    if (a.height == b.height) {
+        return strcmp(a.name, b.name) < 0; // Ordena pelo nome em caso de empate
+    }
+    return a.height < b.height; // Ordem padrão por altura
+}
+
+void reconstruir(Pokemon *array, int tamHeap) {
+    int i = 1;
+    while (i <= (tamHeap / 2)) {
+        int filho = getMaiorFilho(array, i, tamHeap);
+        if (compararPokemon(array[i], array[filho])) {
+            Pokemon temp = array[i];
+            array[i] = array[filho];
+            array[filho] = temp;
+            i = filho;
+        } else {
+            i = tamHeap;
         }
     }
 }
 
-void logarInformacoes(const int matricula, int comparacoes, int movimentacoes, double tempo)
-{
-    FILE *arquivo = fopen("matrícula_bolha.txt", "w");
+void construir(Pokemon *array, int tamHeap) {
+    for (int i = tamHeap / 2; i >= 1; i--) {
+        reconstruir(array, tamHeap);
+    }
+}
 
-    fprintf(arquivo, "%d\t%d\t%d\t%lf", matricula, comparacoes, movimentacoes, tempo);
-    fclose(arquivo);
+void heapsort(Pokemon *array, int n, int limit) {
+    
+    Pokemon arrayTmp[n + 1];
+    for (int i = 0; i < n; i++) {
+        arrayTmp[i + 1] = array[i];
+    }
+
+    construir(arrayTmp, n);
+    for (int tamHeap = n; tamHeap > n - limit; tamHeap--) {
+        Pokemon temp = arrayTmp[1];
+        arrayTmp[1] = arrayTmp[tamHeap];
+        arrayTmp[tamHeap] = temp;
+        reconstruir(arrayTmp, tamHeap - 1);
+    }
+
+    for (int i = 0; i < limit; i++) {
+        array[i] = arrayTmp[i + 1];
+    }
 }
 
 int main()
 {
     // FILE *arq = fopen("pokemon.csv", "r");
-    FILE *arq = fopen("/tmp/pokemon.csv", "r");
+    FILE * arq = fopen("/tmp/pokemon.csv", "r");
 
     char linha[TAM_LINHA];
     int n_Pokemons = 801;
@@ -351,16 +375,10 @@ int main()
             pokeSelect = (Pokemon *)realloc(pokeSelect, sizeof(Pokemon) * (lista_tam + 1));
         }
     }
-    clock_t inicio = clock();
-    bolha(pokeSelect, lista_tam);
-    clock_t fim = clock(); 
 
-    double tempoExecucao = (double)(fim - inicio) / CLOCKS_PER_SEC; 
+    heapsort(pokeSelect, lista_tam, 10);
 
-    logarInformacoes(1528647, numeroComparacoes, numero_movimentacoes, tempoExecucao);
-
-
-    for (int i = 0; i < lista_tam; i++)
+    for (int i = 0; i < 10; i++)
     {
         imprimir(pokeSelect[i]);
     }

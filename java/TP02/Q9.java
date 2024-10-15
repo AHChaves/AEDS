@@ -1,6 +1,8 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -230,6 +232,8 @@ class PokemonQ9 {
 
 public class Q9 {
 
+    private static int numComparacoes = 0, numMovimentacoes = 0;
+
     public static PokemonQ9 buscarPorId(List<PokemonQ9> lista, int id) {
         PokemonQ9 pk = new PokemonQ9();
         for (PokemonQ9 j : lista) {
@@ -257,6 +261,7 @@ public class Q9 {
         int tamHeap = n;
         while (tamHeap > 1) {
             swap(array, 1, tamHeap--);
+
             reconstruir(array, tamHeap);
         }
 
@@ -268,7 +273,9 @@ public class Q9 {
 
     public static void construir(PokemonQ9[] array, int tamHeap) {
         for (int i = tamHeap; i > 1 && compare(array[i], array[i / 2]) > 0; i /= 2) {
+            numComparacoes++;
             swap(array, i, i / 2);
+            numMovimentacoes += 3;
         }
     }
 
@@ -276,8 +283,11 @@ public class Q9 {
         int i = 1;
         while (i <= (tamHeap / 2)) {
             int filho = getMaiorFilho(array, i, tamHeap);
+            numComparacoes++;
+
             if (compare(array[i], array[filho]) < 0) {
                 swap(array, i, filho);
+                numMovimentacoes += 3;
                 i = filho;
             } else {
                 i = tamHeap;
@@ -287,6 +297,8 @@ public class Q9 {
 
     public static int getMaiorFilho(PokemonQ9[] array, int i, int tamHeap) {
         int filho;
+        numComparacoes++;
+
         if (2 * i == tamHeap || compare(array[2 * i], array[2 * i + 1]) > 0) {
             filho = 2 * i;
         } else {
@@ -308,6 +320,15 @@ public class Q9 {
             return -1;
         } else {
             return p1.getName().compareTo(p2.getName());
+        }
+    }
+
+    public static void registrarLog(int matricula, long tempoExecucao) {
+        String nomeArquivo = "matrícula_heapsort.txt";
+        try (FileWriter writer = new FileWriter(nomeArquivo, true)) {
+            writer.write(matricula + "\t" + numComparacoes + "\t" + numMovimentacoes + "\t" + tempoExecucao + "\t");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -347,7 +368,11 @@ public class Q9 {
             }
         }
 
+        long inicioB = System.nanoTime();
         sort(listaImpressao);
+        long fimB = System.nanoTime();
+        long tempoExecucao = Duration.ofNanos(fimB - inicioB).toMillis();
+        registrarLog(1528647, tempoExecucao);
 
         for (PokemonQ9 p : listaImpressao) {
             p.imprimir();

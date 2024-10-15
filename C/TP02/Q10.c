@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <time.h>
 
 #define TAM_STRING (50 + 1)
 #define TAM_LINHA (1000 + 1)
@@ -283,6 +284,8 @@ Pokemon ler(char *linha)
     return poke;
 }
 
+int numeroComparacoes = 0, numero_movimentacoes = 0;
+
 void swap(Pokemon *a, Pokemon *b) {
     Pokemon temp = *a;
     *a = *b;
@@ -297,15 +300,18 @@ void quicksortRec(Pokemon *poke, int esq, int dir) {
         while (poke[i].generation < pivo.generation || 
               (poke[i].generation == pivo.generation && strcmp(poke[i].name, pivo.name) < 0)) {
             i++;
+            numeroComparacoes++;
         }
         while (poke[j].generation > pivo.generation || 
               (poke[j].generation == pivo.generation && strcmp(poke[j].name, pivo.name) > 0)) {
             j--;
+            numeroComparacoes++;
         }
         if (i <= j) {
             Pokemon tmp = poke[i];
             poke[i] = poke[j];
             poke[j] = tmp;
+            numero_movimentacoes+=3;
             i++;
             j--;
         }
@@ -316,6 +322,14 @@ void quicksortRec(Pokemon *poke, int esq, int dir) {
 
 void quicksort(Pokemon *poke, int n) {
     quicksortRec(poke, 0, n - 1);
+}
+
+void logarInformacoes(const int matricula, int comparacoes, int movimentacoes, double tempo)
+{
+    FILE *arquivo = fopen("matrícula_quicksort.txt", "w");
+
+    fprintf(arquivo, "%d\t%d\t%d\t%lf", matricula, comparacoes, movimentacoes, tempo);
+    fclose(arquivo);
 }
 
 int main()
@@ -352,8 +366,13 @@ int main()
             pokeSelect = (Pokemon*)realloc(pokeSelect, sizeof(Pokemon)*(lista_tam+1));
         }
     }
-
+    clock_t inicio = clock();
     quicksort(pokeSelect, lista_tam);
+    clock_t fim = clock(); 
+
+    double tempoExecucao = (double)(fim - inicio) / CLOCKS_PER_SEC; 
+
+    logarInformacoes(1528647, numeroComparacoes, numero_movimentacoes, tempoExecucao);
 
     for(int i = 0; i < lista_tam; i++){
         imprimir(pokeSelect[i]);

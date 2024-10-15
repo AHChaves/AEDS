@@ -1,6 +1,8 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -231,6 +233,8 @@ class PokemonQ11 {
 
 public class Q11 {
 
+    private static int numComparacoes = 0, numMovimentacoes = 0;
+
     public static PokemonQ11 buscarPorId(List<PokemonQ11> lista, int id) {
         PokemonQ11 pk = new PokemonQ11();
         for (PokemonQ11 j : lista) {
@@ -262,11 +266,13 @@ public class Q11 {
             PokemonQ11 pokemon = poke.get(i);
             int captureRate = pokemon.getCaptureRate();
             ordenado[count[captureRate] - 1] = pokemon;
+            numMovimentacoes++;
             count[captureRate]--;
         }
 
         for (int i = 0; i < poke.size(); i++) {
             poke.set(i, ordenado[i]);
+            numMovimentacoes++;
         }
 
         ordenarPorNomeEmCasoDeEmpate(poke);
@@ -280,8 +286,11 @@ public class Q11 {
                         PokemonQ11 temp = poke.get(i);
                         poke.set(i, poke.get(j));
                         poke.set(j, temp);
+                        numMovimentacoes += 3;
                     }
+                    numComparacoes++;
                 }
+                numComparacoes++;
             }
         }
     }
@@ -292,16 +301,26 @@ public class Q11 {
             if (pokemon.getCaptureRate() > maior) {
                 maior = pokemon.getCaptureRate();
             }
+            numComparacoes++;
         }
         return maior;
+    }
+
+    public static void registrarLog(int matricula, long tempoExecucao) {
+        String nomeArquivo = "matrícula_countingsort.txt";
+        try (FileWriter writer = new FileWriter(nomeArquivo, true)) {
+            writer.write(matricula + "\t" + numComparacoes + "\t" + numMovimentacoes + "\t" + tempoExecucao + "\t");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {
 
         Scanner scanner = new Scanner(System.in);
         String entrada;
-        String path = "pokemon.csv";
-        // String path = "/tmp/pokemon.csv";
+        // String path = "pokemon.csv";
+        String path = "/tmp/pokemon.csv";
         List<PokemonQ11> listaPokemon = new ArrayList<>();
         List<PokemonQ11> listaImpressao = new ArrayList<>();
         boolean isFim = false;
@@ -332,7 +351,11 @@ public class Q11 {
             }
         }
 
+        long inicioB = System.nanoTime();
         sort(listaImpressao);
+        long fimB = System.nanoTime();
+        long tempoExecucao = Duration.ofNanos(fimB - inicioB).toMillis();
+        registrarLog(1528647, tempoExecucao);
 
         for (PokemonQ11 p : listaImpressao) {
             p.imprimir();

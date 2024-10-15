@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <time.h>
 
 #define TAM_STRING (50 + 1)
 #define TAM_LINHA (1000 + 1)
@@ -283,6 +284,8 @@ Pokemon ler(char *linha)
     return poke;
 }
 
+int numeroComparacoes = 0, numero_movimentacoes = 0;
+
 void shellSort(Pokemon *pokeSelect, int n)
 {
     for (int gap = n / 2; gap > 0; gap /= 2)
@@ -297,10 +300,21 @@ void shellSort(Pokemon *pokeSelect, int n)
                  strcmp(pokeSelect[j - gap].name, temp.name) > 0)); j -= gap)
             {
                 pokeSelect[j] = pokeSelect[j - gap];
+                numero_movimentacoes++;
+                numeroComparacoes++;
             }
             pokeSelect[j] = temp;
+            numero_movimentacoes++;
         }
     }
+}
+
+void logarInformacoes(const int matricula, int comparacoes, int movimentacoes, double tempo)
+{
+    FILE *arquivo = fopen("matrícula_shellsort.txt", "w");
+
+    fprintf(arquivo, "%d\t%d\t%d\t%lf", matricula, comparacoes, movimentacoes, tempo);
+    fclose(arquivo);
 }
 
 int main()
@@ -337,8 +351,14 @@ int main()
             pokeSelect = (Pokemon*)realloc(pokeSelect, sizeof(Pokemon)*(lista_tam+1));
         }
     }
-
+    clock_t inicio = clock();
     shellSort(pokeSelect, lista_tam);
+    clock_t fim = clock(); 
+
+    double tempoExecucao = (double)(fim - inicio) / CLOCKS_PER_SEC; 
+
+    logarInformacoes(1528647, numeroComparacoes, numero_movimentacoes, tempoExecucao);
+
 
     for(int i = 0; i < lista_tam; i++){
         imprimir(pokeSelect[i]);

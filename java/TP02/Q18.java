@@ -1,15 +1,13 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-class PokemonQ5 {
+class PokemonQ18 {
     private int id;
     private int generation;
     private String name;
@@ -22,7 +20,7 @@ class PokemonQ5 {
     private boolean isLegendary;
     private LocalDate captureDate;
 
-    public PokemonQ5() {
+    public PokemonQ18() {
         this.id = 0;
         this.generation = 0;
         this.name = "";
@@ -34,8 +32,9 @@ class PokemonQ5 {
         this.captureDate.of(0, 1, 1);
     }
 
-    public PokemonQ5(int id, int generation, String name, String description, List<String> type, List<String> abilities,
-            double weight, double height, int captureRate, boolean isLegendary, LocalDate captureDate) {
+    public PokemonQ18(int id, int generation, String name, String description, List<String> type,
+            List<String> abilities, double weight, double height, int captureRate, boolean isLegendary,
+            LocalDate captureDate) {
         this.id = id;
         this.generation = generation;
         this.name = name;
@@ -213,8 +212,8 @@ class PokemonQ5 {
                 + this.isLegendary + " - " + this.generation + " gen] - " + this.captureDate.format(formatter));
     }
 
-    public PokemonQ5 clone() {
-        PokemonQ5 pokemon = new PokemonQ5();
+    public PokemonQ18 clone() {
+        PokemonQ18 pokemon = new PokemonQ18();
         pokemon.id = this.id;
         pokemon.generation = this.generation;
         pokemon.name = this.name;
@@ -230,13 +229,11 @@ class PokemonQ5 {
     }
 }
 
-public class Q5 {
+public class Q18 {
 
-    private static int numComparacoes = 0, numMovimentacoes = 0;
-
-    public static PokemonQ5 buscarPorId(List<PokemonQ5> lista, int id) {
-        PokemonQ5 pk = new PokemonQ5();
-        for (PokemonQ5 j : lista) {
+    public static PokemonQ18 buscarPorId(List<PokemonQ18> lista, int id) {
+        PokemonQ18 pk = new PokemonQ18();
+        for (PokemonQ18 j : lista) {
             if (j.getId() == id) {
                 pk = j.clone();
             }
@@ -244,30 +241,40 @@ public class Q5 {
         return pk;
     }
 
-    public static void sort(List<PokemonQ5> poke) {
-        int n = poke.size();
-
-        for (int i = 0; i < (n - 1); i++) {
-            int menor = i;
-            for (int j = (i + 1); j < n; j++) {
-                if (poke.get(menor).getName().compareTo(poke.get(j).getName()) > 0) {
-                    menor = j;
-                    numComparacoes++;
-                }
-            }
-            PokemonQ5 temp = poke.get(menor);
-            poke.set(menor, poke.get(i));
-            poke.set(i, temp);
-            numMovimentacoes += 3;
-        }
+    public static void sort(List<PokemonQ18> poke, int k) {
+        quicksort(0, poke.size() - 1, k, poke);
     }
 
-    public static void registrarLog(int matricula, long tempoExecucao) {
-        String nomeArquivo = "matrícula_selecao.txt";
-        try (FileWriter writer = new FileWriter(nomeArquivo, true)) {
-            writer.write(matricula + "\t" + numComparacoes + "\t" + numMovimentacoes + "\t" + tempoExecucao + "\t");
-        } catch (IOException e) {
-            e.printStackTrace();
+    private static void quicksort(int esq, int dir, int k, List<PokemonQ18> poke) {
+        int i = esq, j = dir;
+        PokemonQ18 pivo = poke.get((dir + esq) / 2); // Obter o pivô
+
+        while (i <= j) {
+            // Comparação pela geração
+            while (poke.get(i).getGeneration() < pivo.getGeneration() ||
+                    (poke.get(i).getGeneration() == pivo.getGeneration()
+                            && poke.get(i).getName().compareTo(pivo.getName()) < 0)) {
+                i++;
+            }
+            while (poke.get(j).getGeneration() > pivo.getGeneration() ||
+                    (poke.get(j).getGeneration() == pivo.getGeneration()
+                            && poke.get(j).getName().compareTo(pivo.getName()) > 0)) {
+                j--;
+            }
+            if (i <= j) {
+                // Troca de elementos
+                PokemonQ18 temp = poke.get(i);
+                poke.set(i, poke.get(j));
+                poke.set(j, temp);
+                i++;
+                j--;
+            }
+        }
+        if (esq < j) {
+            quicksort(esq, j, k, poke);
+        }
+        if (i < k && i < dir) {
+            quicksort(i, dir, k, poke);
         }
     }
 
@@ -275,10 +282,10 @@ public class Q5 {
 
         Scanner scanner = new Scanner(System.in);
         String entrada;
-        String path = "pokemon.csv";
-        // String path = "/tmp/pokemon.csv";
-        List<PokemonQ5> listaPokemon = new ArrayList<>();
-        List<PokemonQ5> listaImpressao = new ArrayList<>();
+        // String path = "pokemon.csv";
+        String path = "/tmp/pokemon.csv";
+        List<PokemonQ18> listaPokemon = new ArrayList<>();
+        List<PokemonQ18> listaImpressao = new ArrayList<>();
         boolean isFim = false;
 
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
@@ -286,7 +293,8 @@ public class Q5 {
             String linha = br.readLine();
 
             while ((linha = br.readLine()) != null) {
-                PokemonQ5 j = new PokemonQ5();
+                // System.out.println(linha);
+                PokemonQ18 j = new PokemonQ18();
                 j.ler(linha);
                 listaPokemon.add(j);
             }
@@ -305,14 +313,11 @@ public class Q5 {
                 listaImpressao.add(buscarPorId(listaPokemon, id));
             }
         }
-        long inicioB = System.nanoTime();
-        sort(listaImpressao);
-        long fimB = System.nanoTime();
-        long tempoExecucao = Duration.ofNanos(fimB - inicioB).toMillis();
-        registrarLog(1528647, tempoExecucao);
 
-        for (PokemonQ5 p : listaImpressao) {
-            p.imprimir();
+        sort(listaImpressao, 10);
+
+        for (int i = 0; i < 10; i++) {
+            listaImpressao.get(i).imprimir();
         }
 
         scanner.close();

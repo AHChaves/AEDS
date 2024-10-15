@@ -1,6 +1,8 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -231,6 +233,8 @@ class PokemonQ13 {
 
 public class Q13 {
 
+    private static int numComparacoes = 0, numMovimentacoes = 0;
+
     public static PokemonQ13 buscarPorId(List<PokemonQ13> lista, int id) {
         PokemonQ13 pk = new PokemonQ13();
         for (PokemonQ13 j : lista) {
@@ -273,6 +277,8 @@ public class Q13 {
         while (i < n1 && j < n2) {
             int comp = comparePokemon(esquerda.get(i), direita.get(j));
 
+            numComparacoes++;
+            numMovimentacoes++;
             if (comp <= 0) {
                 poke.set(k, esquerda.get(i));
                 i++;
@@ -284,12 +290,14 @@ public class Q13 {
         }
 
         while (i < n1) {
+            numMovimentacoes++;
             poke.set(k, esquerda.get(i));
             i++;
             k++;
         }
 
         while (j < n2) {
+            numMovimentacoes++;
             poke.set(k, direita.get(j));
             j++;
             k++;
@@ -298,11 +306,24 @@ public class Q13 {
 
     private static int comparePokemon(PokemonQ13 p1, PokemonQ13 p2) {
         int typeComparison = p1.getType().get(0).compareTo(p2.getType().get(0));
-
+        int retorno;
+        numComparacoes++;
         if (typeComparison != 0) {
-            return typeComparison;
+            retorno = typeComparison;
         } else {
-            return p1.getName().compareTo(p2.getName());
+            retorno = p1.getName().compareTo(p2.getName());
+            numComparacoes++;
+        }
+
+        return retorno;
+    }
+
+    public static void registrarLog(int matricula, long tempoExecucao) {
+        String nomeArquivo = "matrícula_mergesort.txt";
+        try (FileWriter writer = new FileWriter(nomeArquivo, true)) {
+            writer.write(matricula + "\t" + numComparacoes + "\t" + numMovimentacoes + "\t" + tempoExecucao + "\t");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -342,7 +363,11 @@ public class Q13 {
             }
         }
 
+        long inicioB = System.nanoTime();
         sort(listaImpressao);
+        long fimB = System.nanoTime();
+        long tempoExecucao = Duration.ofNanos(fimB - inicioB).toMillis();
+        registrarLog(1528647, tempoExecucao);
 
         for (PokemonQ13 p : listaImpressao) {
             p.imprimir();

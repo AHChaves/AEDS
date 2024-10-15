@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <time.h>
 
 #define TAM_STRING (50 + 1)
 #define TAM_LINHA (1000 + 1)
@@ -283,6 +284,8 @@ Pokemon ler(char *linha)
     return poke;
 }
 
+int numeroComparacoes = 0, numero_movimentacoes = 0;
+
 void RecurSelectionSort(Pokemon* poke, int n, int index)
 {
     if (index == n){
@@ -294,15 +297,25 @@ void RecurSelectionSort(Pokemon* poke, int n, int index)
         if (strcmp(poke[i].name, poke[menor].name) < 0 ) {
             menor = i;
         }
+        numeroComparacoes++;
     }
  
     if (menor != index){
         Pokemon tmp = poke[menor];
         poke[menor] = poke[index];
         poke[index] = tmp;
+        numero_movimentacoes+=3;
     }
  
     RecurSelectionSort(poke, n, index + 1);
+}
+
+void logarInformacoes(const int matricula, int comparacoes, int movimentacoes, double tempo)
+{
+    FILE *arquivo = fopen("matrícula_selecaoRecursiva.txt", "w");
+
+    fprintf(arquivo, "%d\t%d\t%d\t%lf", matricula, comparacoes, movimentacoes, tempo);
+    fclose(arquivo);
 }
 
 int main()
@@ -339,8 +352,14 @@ int main()
             pokeSelect = (Pokemon*)realloc(pokeSelect, sizeof(Pokemon)*(lista_tam+1));
         }
     }
-
+    clock_t inicio = clock();
     RecurSelectionSort(pokeSelect, lista_tam, 0);
+    clock_t fim = clock(); 
+
+    double tempoExecucao = (double)(fim - inicio) / CLOCKS_PER_SEC; 
+
+    logarInformacoes(1528647, numeroComparacoes, numero_movimentacoes, tempoExecucao);
+
 
     for(int i = 0; i < lista_tam; i++){
         imprimir(pokeSelect[i]);

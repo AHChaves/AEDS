@@ -2,13 +2,13 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <time.h>
 
 #define TAM_STRING (50 + 1)
 #define TAM_LINHA (1000 + 1)
 #define TAM_MAX_LISTA 6
 #define NUM_MAX_TYPES 2
 #define NUM_INFO 17
+#define MAX_CHAR 256
 
 // IMPLEMENTACAO DE LISTA RETIRADA DO GITHUB DA DISCIPLINA
 //--------------------------------------------------------------------------------------------------------------------//
@@ -283,44 +283,63 @@ Pokemon ler(char *linha)
     return poke;
 }
 
-int numeroComparacoes = 0, numero_movimentacoes = 0;
-
-void swap(Pokemon *a, Pokemon *b)
-{
-    Pokemon temp = *a;
-    *a = *b;
-    *b = temp;
+int getMaxLength(Pokemon arr[], int n) {
+    int maxLength = 0;
+    for (int i = 0; i < n; i++) {
+        if (arr[i].abilities->n > 0) {
+            int len = strlen(arr[i].abilities->array[0]);
+            if (len > maxLength) {
+                maxLength = len;
+            }
+        }
+    }
+    return maxLength;
 }
 
-void bolha(Pokemon *poke, int n)
-{
-    int i, j;
-    for (i = 0; i < n; i++)
-    {
-        for (j = i; j < n; j++)
-        {
-            if (poke[i].id > poke[j].id)
-            {
-                swap(&poke[i], &poke[j]);
-                numero_movimentacoes += 3;
-            }
-            numeroComparacoes++;
-        }
+// Função para fazer a ordenação por contagem em uma posição específica
+void countingSort(Pokemon arr[], int n, int pos) {
+    Pokemon output[n]; // Array de saída para armazenar os resultados ordenados
+    int count[257] = {0}; // Contagem de cada caractere (256 para caracteres + 1 para o valor '0')
+
+    // Contagem das ocorrências de cada caractere
+    for (int i = 0; i < n; i++) {
+        char ch = (arr[i].abilities->n > 0 && strlen(arr[i].abilities->array[0]) > pos) ? arr[i].abilities->array[0][pos] : 0;
+        count[(int)ch + 1]++;  // Incrementa o valor no índice correspondente
+    }
+
+    // Ajuste da contagem para que as posições reflitam as posições corretas
+    for (int i = 1; i < 257; i++) {
+        count[i] += count[i - 1];
+    }
+
+    // Construção do array de saída
+    for (int i = n - 1; i >= 0; i--) {
+        char ch = (arr[i].abilities->n > 0 && strlen(arr[i].abilities->array[0]) > pos) ? arr[i].abilities->array[0][pos] : 0;
+        output[count[(int)ch]++] = arr[i];
+    }
+
+    // Copiar o array de saída para o array original
+    for (int i = 0; i < n; i++) {
+        arr[i] = output[i];
     }
 }
 
-void logarInformacoes(const int matricula, int comparacoes, int movimentacoes, double tempo)
-{
-    FILE *arquivo = fopen("matrícula_bolha.txt", "w");
+// Função principal do Radix Sort
+void radixSort(Pokemon arr[], int n) {
+    // Encontrar o comprimento da maior habilidade
+    int maxLength = getMaxLength(arr, n);
 
-    fprintf(arquivo, "%d\t%d\t%d\t%lf", matricula, comparacoes, movimentacoes, tempo);
-    fclose(arquivo);
+    // Fazer a ordenação de trás para frente (da última posição até a primeira)
+    for (int pos = maxLength - 1; pos >= 0; pos--) {
+        countingSort(arr, n, pos);
+    }
 }
+
 
 int main()
 {
-    // FILE *arq = fopen("pokemon.csv", "r");
-    FILE *arq = fopen("/tmp/pokemon.csv", "r");
+    FILE *arq = fopen("pokemon.csv", "r");
+    // FILE * arq = fopen("/tmp/pokemon.csv", "r");
 
     char linha[TAM_LINHA];
     int n_Pokemons = 801;
@@ -351,14 +370,8 @@ int main()
             pokeSelect = (Pokemon *)realloc(pokeSelect, sizeof(Pokemon) * (lista_tam + 1));
         }
     }
-    clock_t inicio = clock();
-    bolha(pokeSelect, lista_tam);
-    clock_t fim = clock(); 
 
-    double tempoExecucao = (double)(fim - inicio) / CLOCKS_PER_SEC; 
-
-    logarInformacoes(1528647, numeroComparacoes, numero_movimentacoes, tempoExecucao);
-
+    radixSort(pokeSelect, lista_tam);
 
     for (int i = 0; i < lista_tam; i++)
     {
