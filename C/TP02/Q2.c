@@ -433,9 +433,7 @@ int main()
     fgets(linha, sizeof(linha), arq); // Descartar a primeira linha
     while (fgets(linha, sizeof(linha), arq) != NULL)
     {
-
         poke[poke_index] = ler(linha);
-        // imprimir(poke[poke_index]);
         poke_index++;
     }
 

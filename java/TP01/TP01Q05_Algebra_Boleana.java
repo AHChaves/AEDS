@@ -1,6 +1,6 @@
 import java.util.Scanner;
 
-public class Program {
+public class TP01Q05_Algebra_Boleana {
   private static String substituiValores(int[] portas, String texto) {
     String novoTexto = "";
 
@@ -51,7 +51,8 @@ public class Program {
           novoTexto += (texto.charAt(i + 4) == '1' && texto.charAt(i + 6) == '1' && texto.charAt(i + 8) == '1') ? 1 : 0;
           i += 9;
         } else if (texto.charAt(i + 11) == ')') {
-          novoTexto += (texto.charAt(i + 4) == '1' && texto.charAt(i + 6) == '1' && texto.charAt(i + 8) == '1' && texto.charAt(i + 10) == '1') ? 1 : 0;
+          novoTexto += (texto.charAt(i + 4) == '1' && texto.charAt(i + 6) == '1' && texto.charAt(i + 8) == '1'
+              && texto.charAt(i + 10) == '1') ? 1 : 0;
           i += 11;
         } else {
           novoTexto += texto.charAt(i);
@@ -71,17 +72,18 @@ public class Program {
       if (texto.charAt(i) == 'o' && texto.charAt(i + 1) == 'r' &&
           (texto.charAt(i + 3) == '1' || texto.charAt(i + 3) == '0') &&
           (texto.charAt(i + 5) == '1' || texto.charAt(i + 5) == '0')) {
-        //   or(A,B,C)
-        //   and(A,B,C,D)
+        // or(A,B,C)
+        // and(A,B,C,D)
         // i+0123456789
         if (texto.charAt(i + 6) == ')') {
           novoTexto += (texto.charAt(i + 3) == '1' || texto.charAt(i + 5) == '1') ? 1 : 0;
           i += 6;
-        } else if (texto.charAt(i + 8) == ')'){
+        } else if (texto.charAt(i + 8) == ')') {
           novoTexto += (texto.charAt(i + 3) == '1' || texto.charAt(i + 5) == '1' || texto.charAt(i + 7) == '1') ? 1 : 0;
           i += 8;
         } else if (texto.charAt(i + 10) == ')') {
-          novoTexto += (texto.charAt(i + 3) == '1' || texto.charAt(i + 5) == '1' || texto.charAt(i + 7) == '1' || texto.charAt(i + 9) == '1') ? 1 : 0;
+          novoTexto += (texto.charAt(i + 3) == '1' || texto.charAt(i + 5) == '1' || texto.charAt(i + 7) == '1'
+              || texto.charAt(i + 9) == '1') ? 1 : 0;
           i += 10;
         }
       } else
@@ -115,7 +117,7 @@ public class Program {
         texto = not(texto);
       else
         texto = or(texto);
-      //System.out.println(stack[i] + ": " + texto);
+      // System.out.println(stack[i] + ": " + texto);
     }
 
     return texto;

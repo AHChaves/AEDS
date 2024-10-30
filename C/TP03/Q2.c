@@ -6,6 +6,7 @@
 
 #define TAM_STRING (50 + 1)
 #define TAM_LINHA (1000 + 1)
+#define QTD_POKEMONS 801
 #define TAM_MAX_LISTA 6
 #define NUM_MAX_TYPES 2
 #define NUM_INFO 17
@@ -67,7 +68,6 @@ void mostrar(Lista *l)
             printf(", ");
     }
 }
-
 
 // FIM IMPLEMENTACAO LISTA
 //----------------------------------------------------------------------------------------------------------------------------------//
@@ -284,44 +284,138 @@ Pokemon ler(char *linha)
     return poke;
 }
 
-int numeroComparacoes = 0;
+//======================================================= Lista de Pokemons =============================================
 
-bool pesquisaBinaria(Pokemon *arr, char *nome, int tam)
+typedef struct LP
 {
-    bool achou = false;
-    int esq = 0;
-    int dir = tam - 1;
-    int meio;
-    while (esq <= dir)
-    {
-        meio = (dir + esq) / 2;
-        int comparacao = strcmp(arr[meio].name, nome);
-        numeroComparacoes++;
+    Pokemon array[QTD_POKEMONS]; // Elementos da pilha
+    int n;                       // Quantidade de array.
+} Lista_Pokemon;
 
-        if (comparacao == 0)
+void start_LP(Lista_Pokemon *l)
+{
+    l->n = 0;
+}
+
+void inserirInicio_LP(Pokemon x, Lista_Pokemon *l)
+{
+    int i;
+
+    // validar insercao
+    if (l->n >= QTD_POKEMONS)
+        printf("Erro ao inserir!");
+    else
+    {
+
+        // levar elementos para o fim do array
+        for (i = l->n; i > 0; i--)
         {
-            achou = true;
-            esq = dir+1;
+            l->array[i] = l->array[i - 1];
         }
-        else if (comparacao < 0)
+
+        l->array[0] = x;
+        l->n++;
+    }
+}
+
+void inserirFim_LP(Pokemon x, Lista_Pokemon* l)
+{
+    if (l->n >= QTD_POKEMONS)
+        printf("Erro ao inserir!");
+    else
+    {
+        l->array[l->n] = x;
+        l->n++;
+    }
+}
+
+void inserir_LP(Pokemon x, int pos, Lista_Pokemon* l)
+{
+    int i;
+
+    if (l->n >= QTD_POKEMONS || pos < 0 || pos > l->n)
+        printf("Erro ao inserir!");
+    else
+    {
+        // levar elementos para o fim do array
+        for (i = l->n; i > pos; i--)
         {
-            esq = meio + 1;
+            l->array[i] = l->array[i - 1];
         }
-        else
+
+        l->array[pos] = x;
+        l->n++;
+    }
+}
+
+Pokemon removerInicio_LP(Lista_Pokemon* l)
+{
+    int i;
+    Pokemon resp;
+
+    if (l->n == 0)
+        printf("Erro ao remover!");
+    else
+    {
+        resp = l->array[0];
+        l->n--;
+        for (i = 0; i < l->n; i++)
         {
-            dir = meio - 1;
+            l->array[i] = l->array[i + 1];
         }
     }
-    return achou;
+
+    return resp;
 }
 
-void logarInformacoes(const int matricula, int comparacoes, double tempo)
+Pokemon removerFim_LP(Lista_Pokemon* l)
 {
-    FILE *arquivo = fopen("matrícula_binaria.txt", "w");
 
-    fprintf(arquivo, "%d\t%d\t%lf", matricula, comparacoes, tempo);
-    fclose(arquivo);
+    // validar remocao
+    if (l->n == 0)
+    {
+        printf("Erro ao remover!");
+        exit(1);
+    }
+
+    return l->array[--l->n];
 }
+
+Pokemon remover_LP(int pos, Lista_Pokemon* l)
+{
+    int i;
+    Pokemon resp;
+
+    // validar remocao
+    if (l->n == 0 || pos < 0 || pos >= l->n)
+        printf("Erro ao remover!");
+    else
+    {
+
+        resp = l->array[pos];
+        l->n--;
+
+        for (i = pos; i < l->n; i++)
+        {
+            l->array[i] = l->array[i + 1];
+        }
+    }
+
+    return resp;
+}
+
+void mostrar_LP(Lista_Pokemon l)
+{
+    int i;
+
+    for (i = 0; i < l.n; i++)
+    {
+        printf("[%d] ", i);
+        imprimir(l.array[i]);
+    }
+}
+
+//===================================================== Fim Lista de Pokemons =============================================
 
 int main()
 {
@@ -329,10 +423,9 @@ int main()
     FILE * arq = fopen("/tmp/pokemon.csv", "r");
 
     char linha[TAM_LINHA];
-    int n_Pokemons = 801;
-    Pokemon *poke = (Pokemon *)malloc(sizeof(Pokemon) * n_Pokemons);
-    Pokemon *pokeSelect = (Pokemon *)malloc(sizeof(Pokemon));
-    int lista_tam = 0;
+    Pokemon *poke = (Pokemon *)malloc(sizeof(Pokemon) * QTD_POKEMONS);
+    Lista_Pokemon pokeSelect;
+    start_LP(&pokeSelect);
 
     int poke_index = 0;
 
@@ -354,30 +447,56 @@ int main()
         if (strcmp(entrada, "FIM") != 0)
         {
             int id_input = atoi(entrada);
-            pokeSelect[lista_tam] = Buscar_Pokemon_ID(id_input, poke, n_Pokemons);
-            lista_tam++;
-            pokeSelect = (Pokemon*)realloc(pokeSelect, sizeof(Pokemon)*(lista_tam+1));
+            inserirFim_LP(Buscar_Pokemon_ID(id_input, poke, QTD_POKEMONS), &pokeSelect);
         }
     }
 
-    strcpy(entrada, "entrada");
+    int n_operacoes;
 
-    clock_t inicio = clock();
-    while (strcmp(entrada, "FIM") != 0)
+    scanf("%d", &n_operacoes);
+
+    for (int i = 0; i < n_operacoes; i++)
     {
-        scanf("%s", entrada);
-        if (strcmp(entrada, "FIM") != 0)
+        char operacao[3];
+        scanf("%2s", operacao);
+        if (strcmp(operacao, "II") == 0)
         {
-            char* result;
-            result = (pesquisaBinaria(pokeSelect, entrada, (lista_tam+1))) ? "SIM" : "NAO";
-            printf("%s\n", result);
+            int id;
+            scanf("%d", &id);
+            inserirInicio_LP(Buscar_Pokemon_ID(id, poke, QTD_POKEMONS), &pokeSelect);
+        }
+        else if (strcmp(operacao, "IF") == 0)
+        {
+            int id;
+            scanf("%d", &id);
+            inserirFim_LP(Buscar_Pokemon_ID(id, poke, QTD_POKEMONS), &pokeSelect);
+        }
+        else if (strcmp(operacao, "I*") == 0)
+        {
+            int id, pos;
+            scanf("%d %d", &pos, &id);
+            inserir_LP(Buscar_Pokemon_ID(id, poke, QTD_POKEMONS), pos, &pokeSelect);
+        }
+        else if (strcmp(operacao, "RI") == 0)
+        {
+            Pokemon p = removerInicio_LP(&pokeSelect);
+            printf("(R) %s\n", p.name);
+        }
+        else if (strcmp(operacao, "RF") == 0)
+        {
+            Pokemon p = removerFim_LP(&pokeSelect);
+            printf("(R) %s\n", p.name);
+        }
+        else if (strcmp(operacao, "R*") == 0)
+        {
+            int pos;
+            scanf("%d", &pos);
+            Pokemon p = remover_LP(pos, &pokeSelect);
+            printf("(R) %s\n", p.name);
         }
     }
-    clock_t fim = clock(); 
 
-    double tempoExecucao = (double)(fim - inicio) / CLOCKS_PER_SEC; 
-
-    logarInformacoes(1528647, numeroComparacoes, tempoExecucao);
+    mostrar_LP(pokeSelect);
 
     free(poke);
     fclose(arq);

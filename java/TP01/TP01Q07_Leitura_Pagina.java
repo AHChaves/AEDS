@@ -18,6 +18,7 @@ public class TP01Q07_Leitura_Pagina {
     }
 
     public static void processaPagina(String endereco, String nomePagina) throws Exception {
+        @SuppressWarnings("deprecation")
         URL url = new URL(endereco);
         BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
         String inputLine;

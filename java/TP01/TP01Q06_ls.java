@@ -8,10 +8,10 @@ public class TP01Q06_ls {
 
         while (!sair && scanner.hasNextLine()) {
             String input = scanner.nextLine();
-           
+
             sair = input.equals("FIM");
-           
-            if(!sair){
+
+            if (!sair) {
                 boolean isVowels = areAllVowels(input);
                 boolean isConsonants = areAllConsonants(input);
                 boolean isInteger = isInteger(input);
@@ -23,6 +23,8 @@ public class TP01Q06_ls {
                         (isReal ? "SIM" : "NAO"));
             }
         }
+
+        scanner.close();
     }
 
     // Confere se todos os caracteres sao vogais
@@ -91,7 +93,7 @@ public class TP01Q06_ls {
         return result;
     }
 
-    //verifica se a entrada eh composta por um numero real
+    // verifica se a entrada eh composta por um numero real
     private static boolean isReal(String s) {
         int i = 0;
         int length = s.length();
@@ -116,7 +118,7 @@ public class TP01Q06_ls {
                             i = length; // Termina o loop
                         }
                         hasDot = true;
-                    } else if (c < '0' || c > '9') { //confere se eh composto por numeros
+                    } else if (c < '0' || c > '9') { // confere se eh composto por numeros
                         result = false;
                         i = length; // Termina o loop
                     }

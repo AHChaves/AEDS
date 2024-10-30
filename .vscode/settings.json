@@ -1,5 +1,12 @@
 {
     "files.associations": {
         "time.h": "c"
-    }
+    },
+    "java.project.sourcePaths": [
+        "java/labs",
+        "java/TP03",
+        "java/TP02",
+        "java/TP01",
+        "java"
+    ]
 }

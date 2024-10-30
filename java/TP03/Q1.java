@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-class Pokemon {
+class PokemonQ1 {
     private int id;
     private int generation;
     private String name;
@@ -20,7 +20,7 @@ class Pokemon {
     private boolean isLegendary;
     private LocalDate captureDate;
 
-    public Pokemon() {
+    public PokemonQ1() {
         this.id = 0;
         this.generation = 0;
         this.name = "";
@@ -29,10 +29,10 @@ class Pokemon {
         this.height = 0;
         this.captureRate = 0;
         this.isLegendary = false;
-        this.captureDate.of(0, 1, 1);
+        this.captureDate = LocalDate.of(0, 1, 1);
     }
 
-    public Pokemon(int id, int generation, String name, String description, List<String> type, List<String> abilities,
+    public PokemonQ1(int id, int generation, String name, String description, List<String> type, List<String> abilities,
             double weight, double height, int captureRate, boolean isLegendary, LocalDate captureDate) {
         this.id = id;
         this.generation = generation;
@@ -211,8 +211,8 @@ class Pokemon {
                 + this.isLegendary + " - " + this.generation + " gen] - " + this.captureDate.format(formatter));
     }
 
-    public Pokemon Clone() {
-        Pokemon pokemon = new Pokemon();
+    public PokemonQ1 clone() {
+        PokemonQ1 pokemon = new PokemonQ1();
         pokemon.id = this.id;
         pokemon.generation = this.generation;
         pokemon.name = this.name;
@@ -228,33 +228,224 @@ class Pokemon {
     }
 }
 
+class Lista {
+    private PokemonQ1[] array;
+    private int n;
+
+    public Lista() {
+        this(6);
+    }
+
+    public Lista(int tamanho) {
+        array = new PokemonQ1[tamanho];
+        n = 0;
+    }
+
+    public int getN() {
+        return this.n;
+    }
+
+    public void inserirInicio(PokemonQ1 x) throws Exception {
+
+        // validar insercao
+        if (n >= array.length) {
+            throw new Exception("Erro ao inserir!");
+        }
+
+        // levar elementos para o fim do array
+        for (int i = n; i > 0; i--) {
+            array[i] = array[i - 1];
+        }
+
+        array[0] = x;
+        n++;
+    }
+
+    public void inserirFim(PokemonQ1 x) throws Exception {
+
+        // validar insercao
+        if (n >= array.length) {
+            throw new Exception("Erro ao inserir!");
+        }
+
+        array[n] = x;
+        n++;
+    }
+
+    public void inserir(PokemonQ1 x, int pos) throws Exception {
+
+        // validar insercao
+        if (n >= array.length || pos < 0 || pos > n) {
+            throw new Exception("Erro ao inserir!");
+        }
+
+        // levar elementos para o fim do array
+        for (int i = n; i > pos; i--) {
+            array[i] = array[i - 1];
+        }
+
+        array[pos] = x;
+        n++;
+    }
+
+    public PokemonQ1 removerInicio() throws Exception {
+
+        // validar remocao
+        if (n == 0) {
+            throw new Exception("Erro ao remover!");
+        }
+
+        PokemonQ1 resp = array[0];
+        n--;
+
+        for (int i = 0; i < n; i++) {
+            array[i] = array[i + 1];
+        }
+
+        return resp;
+    }
+
+    public PokemonQ1 removerFim() throws Exception {
+
+        // validar remocao
+        if (n == 0) {
+            throw new Exception("Erro ao remover!");
+        }
+
+        return array[--n];
+    }
+
+    public PokemonQ1 remover(int pos) throws Exception {
+
+        if (n == 0 || pos < 0 || pos >= n) {
+            throw new Exception("Erro ao remover!");
+        }
+
+        PokemonQ1 resp = array[pos];
+        n--;
+
+        for (int i = pos; i < n; i++) {
+            array[i] = array[i + 1];
+        }
+
+        return resp;
+    }
+
+    public void mostrar() {
+        for (int i = 0; i < n; i++) {
+            System.out.print("[" + i + "] ");
+            array[i].imprimir();
+        }
+    }
+
+    public boolean pesquisar(PokemonQ1 x) {
+        boolean retorno = false;
+        for (int i = 0; i < n && retorno == false; i++) {
+            retorno = (array[i] == x);
+        }
+        return retorno;
+    }
+}
+
 public class Q1 {
 
-    public static Pokemon buscarPorId(List<Pokemon> lista, int id) {
-        Pokemon pk = new Pokemon();
-        for (Pokemon j : lista) {
+    public static PokemonQ1 buscarPorId(List<PokemonQ1> lista, int id) {
+        PokemonQ1 pk = new PokemonQ1();
+        for (PokemonQ1 j : lista) {
             if (j.getId() == id) {
-                pk = j.Clone();
+                pk = j.clone();
             }
         }
         return pk;
     }
 
+    public static void listMenu(List<PokemonQ1> pl, Lista l, Scanner scanner) {
+
+        int n_operations = scanner.nextInt();
+
+        for (int i = 0; i < n_operations; i++) {
+            int number = 0, pos = 0;
+            String entrada = scanner.next();
+
+            switch (entrada) {
+                case "II": {
+                    number = scanner.nextInt();
+                    PokemonQ1 p = buscarPorId(pl, number);
+                    try {
+                        l.inserirInicio(p);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                }
+                case "I*": {
+                    pos = scanner.nextInt();
+                    number = scanner.nextInt();
+                    try {
+                        l.inserir(buscarPorId(pl, number), pos);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                }
+                case "IF": {
+                    number = scanner.nextInt();
+                    try {
+                        l.inserirFim(buscarPorId(pl, number));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                }
+                case "RI": {
+                    try {
+                        PokemonQ1 p = l.removerInicio();
+                        System.out.println("(R) " + p.getName());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                }
+                case "RF": {
+                    try {
+                        PokemonQ1 p = l.removerFim();
+                        System.out.println("(R) " + p.getName());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                }
+                case "R*": {
+                    pos = scanner.nextInt();
+                    try {
+                        PokemonQ1 p = l.remover(pos);
+                        System.out.println("(R) " + p.getName());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                }
+
+            }
+        }
+
+    }
+
     public static void main(String[] args) {
 
         Scanner scanner = new Scanner(System.in);
+        String entrada;
         // String path = "pokemon.csv";
         String path = "/tmp/pokemon.csv";
-        List<Pokemon> listaPokemon = new ArrayList<>();
+        List<PokemonQ1> listaPokemon = new ArrayList<>();
+        Lista listaImpressao = new Lista(801);
         boolean isFim = false;
 
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
 
             String linha = br.readLine();
-
             while ((linha = br.readLine()) != null) {
-                // System.out.println(linha);
-                Pokemon j = new Pokemon();
+                PokemonQ1 j = new PokemonQ1();
                 j.ler(linha);
                 listaPokemon.add(j);
             }
@@ -263,17 +454,25 @@ public class Q1 {
         }
 
         while (!isFim) {
-            String entrada = scanner.nextLine();
+            entrada = scanner.nextLine();
 
             if (entrada.equals("FIM"))
                 isFim = true;
 
             if (!isFim) {
                 int id = Integer.parseInt(entrada);
-                Pokemon jogadorEncontrado = buscarPorId(listaPokemon, id);
-                jogadorEncontrado.imprimir();
+                try {
+                    listaImpressao.inserirFim(buscarPorId(listaPokemon, id));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
+
+        listMenu(listaPokemon, listaImpressao, scanner);
+
+        listaImpressao.mostrar();
+
         scanner.close();
     }
 }
