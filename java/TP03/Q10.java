@@ -256,101 +256,10 @@ class ListaDupla {
         ultimo = primeiro;
     }
 
-    public void inserirInicio(PokemonQ10 x) {
-        CelulaDupla tmp = new CelulaDupla(x);
-
-        tmp.ant = primeiro;
-        tmp.prox = primeiro.prox;
-        primeiro.prox = tmp;
-        if (primeiro == ultimo) {
-            ultimo = tmp;
-        } else {
-            tmp.prox.ant = tmp;
-        }
-        tmp = null;
-    }
-
     public void inserirFim(PokemonQ10 x) {
         ultimo.prox = new CelulaDupla(x);
         ultimo.prox.ant = ultimo;
         ultimo = ultimo.prox;
-    }
-
-    public PokemonQ10 removerInicio() throws Exception {
-        if (primeiro == ultimo) {
-            throw new Exception("Erro ao remover (vazia)!");
-        }
-
-        CelulaDupla tmp = primeiro;
-        primeiro = primeiro.prox;
-        PokemonQ10 resp = primeiro.elemento;
-        tmp.prox = primeiro.ant = null;
-        tmp = null;
-        return resp;
-    }
-
-    public PokemonQ10 removerFim() throws Exception {
-        if (primeiro == ultimo) {
-            throw new Exception("Erro ao remover (vazia)!");
-        }
-        PokemonQ10 resp = ultimo.elemento;
-        ultimo = ultimo.ant;
-        ultimo.prox.ant = null;
-        ultimo.prox = null;
-        return resp;
-    }
-
-    public void inserir(PokemonQ10 x, int pos) throws Exception {
-
-        int tamanho = tamanho();
-
-        if (pos < 0 || pos > tamanho) {
-            throw new Exception("Erro ao inserir posicao (" + pos + " / tamanho = " + tamanho + ") invalida!");
-        } else if (pos == 0) {
-            inserirInicio(x);
-        } else if (pos == tamanho) {
-            inserirFim(x);
-        } else {
-            // Caminhar ate a posicao anterior a insercao
-            CelulaDupla i = primeiro;
-            for (int j = 0; j < pos; j++, i = i.prox)
-                ;
-
-            CelulaDupla tmp = new CelulaDupla(x);
-            tmp.ant = i;
-            tmp.prox = i.prox;
-            tmp.ant.prox = tmp.prox.ant = tmp;
-            tmp = i = null;
-        }
-    }
-
-    public PokemonQ10 remover(int pos) throws Exception {
-        PokemonQ10 resp;
-        int tamanho = tamanho();
-
-        if (primeiro == ultimo) {
-            throw new Exception("Erro ao remover (vazia)!");
-
-        } else if (pos < 0 || pos >= tamanho) {
-            throw new Exception("Erro ao remover (posicao " + pos + " / " + tamanho + " invalida!");
-        } else if (pos == 0) {
-            resp = removerInicio();
-        } else if (pos == tamanho - 1) {
-            resp = removerFim();
-        } else {
-            // Caminhar ate a posicao anterior a insercao
-            CelulaDupla i = primeiro.prox;
-            for (int j = 0; j < pos; j++, i = i.prox)
-                ;
-
-            i.ant.prox = i.prox;
-            i.prox.ant = i.ant;
-            resp = i.elemento;
-            i.prox = i.ant = null;
-            i = null;
-        }
-
-        return resp;
     }
 
     public void mostrar() {
@@ -358,30 +267,6 @@ class ListaDupla {
         for (CelulaDupla i = primeiro.prox; i != null; i = i.prox) {
             i.elemento.imprimir();
         }
-    }
-
-    public void mostrarInverso() {
-        for (CelulaDupla i = ultimo; i != primeiro; i = i.ant) {
-            i.elemento.imprimir();
-        }
-    }
-
-    public boolean pesquisar(PokemonQ10 x) {
-        boolean resp = false;
-        for (CelulaDupla i = primeiro.prox; i != null; i = i.prox) {
-            if (i.elemento == x) {
-                resp = true;
-                i = ultimo;
-            }
-        }
-        return resp;
-    }
-
-    public int tamanho() {
-        int tamanho = 0;
-        for (CelulaDupla i = primeiro; i != ultimo; i = i.prox, tamanho++)
-            ;
-        return tamanho;
     }
 }
 // --------------------------------------------------------- Fim da
