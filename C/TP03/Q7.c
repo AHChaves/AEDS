@@ -342,14 +342,14 @@ Pokemon dequeue_fila(Fila *f){
 
 void imprimir_media_ids(Fila *f) {
     Celula *temp = f->primeiro->prox;
-    int soma = 0;
+    double soma = 0;
 
     do {
         soma += temp->elemento.captureRate;
         temp = temp->prox;
     } while (temp != f->primeiro->prox);
-    double media = soma / f->size;
-    printf("Média: %d\n", media);
+    double media = soma / (double)f->size;
+    printf("Média: %.lf\n", media);
 }
 
 void enqueue_fila(Fila *f, Pokemon elemento){
