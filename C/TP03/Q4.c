@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <time.h>
+#include <math.h>
 
 #define TAM_STRING (50 + 1)
 #define TAM_LINHA (1000 + 1)
@@ -328,12 +329,12 @@ void inserir_FC(Pokemon x, Fila_Circ_Pokemon* l)
     l->fim = (l->fim + 1) % TAM_FILA_CIRC;
     l->n++;
 
-    int soma = 0;
+    double soma = 0;
     for (int i = 0; i < l->n; i++) {
         soma += l->array[i].captureRate;
     }
-    int media = soma / l->n;
-    printf("Média: %d\n", media);
+    double media = soma / (double)l->n;
+    printf("Média: %.lf\n", round(media));
 }
 
 void mostrar_LP(Fila_Circ_Pokemon l)
