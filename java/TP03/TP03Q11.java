@@ -204,7 +204,7 @@ class Matriz {
     }
 }
 
-public class Q11 {
+public class TP03Q11 {
 
     public static void inserirMatriz(int[][] matriz, int tam_linha, int tam_col, Scanner s) {
         for (int n = 0; n < tam_linha; n++) {

@@ -1,15 +1,13 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-class PokemonQ3 {
+class PokemonQ18 {
     private int id;
     private int generation;
     private String name;
@@ -22,7 +20,7 @@ class PokemonQ3 {
     private boolean isLegendary;
     private LocalDate captureDate;
 
-    public PokemonQ3() {
+    public PokemonQ18() {
         this.id = 0;
         this.generation = 0;
         this.name = "";
@@ -31,11 +29,12 @@ class PokemonQ3 {
         this.height = 0;
         this.captureRate = 0;
         this.isLegendary = false;
-        this.captureDate.of(0, 1, 1);
+        LocalDate.of(0, 1, 1);
     }
 
-    public PokemonQ3(int id, int generation, String name, String description, List<String> type, List<String> abilities,
-            double weight, double height, int captureRate, boolean isLegendary, LocalDate captureDate) {
+    public PokemonQ18(int id, int generation, String name, String description, List<String> type,
+            List<String> abilities, double weight, double height, int captureRate, boolean isLegendary,
+            LocalDate captureDate) {
         this.id = id;
         this.generation = generation;
         this.name = name;
@@ -213,8 +212,8 @@ class PokemonQ3 {
                 + this.isLegendary + " - " + this.generation + " gen] - " + this.captureDate.format(formatter));
     }
 
-    public PokemonQ3 clone() {
-        PokemonQ3 pokemon = new PokemonQ3();
+    public PokemonQ18 clone() {
+        PokemonQ18 pokemon = new PokemonQ18();
         pokemon.id = this.id;
         pokemon.generation = this.generation;
         pokemon.name = this.name;
@@ -230,13 +229,11 @@ class PokemonQ3 {
     }
 }
 
-public class Q3 {
+public class TP02Q18 {
 
-    private static int numComparacoes = 0;
-
-    public static PokemonQ3 buscarPorId(List<PokemonQ3> lista, int id) {
-        PokemonQ3 pk = new PokemonQ3();
-        for (PokemonQ3 j : lista) {
+    public static PokemonQ18 buscarPorId(List<PokemonQ18> lista, int id) {
+        PokemonQ18 pk = new PokemonQ18();
+        for (PokemonQ18 j : lista) {
             if (j.getId() == id) {
                 pk = j.clone();
             }
@@ -244,27 +241,40 @@ public class Q3 {
         return pk;
     }
 
-    public static boolean pesqSeq(List<PokemonQ3> poke, String name) {
-        boolean resp = false;
-        int n = poke.size();
-
-        for (int i = 0; i < n; i++) {
-            String pokeName = poke.get(i).getName();
-            numComparacoes++;
-            if (pokeName.equals(name)) {
-                resp = true;
-                i = n;
-            }
-        }
-        return resp;
+    public static void sort(List<PokemonQ18> poke, int k) {
+        quicksort(0, poke.size() - 1, k, poke);
     }
 
-    public static void registrarLog(int matricula, long tempoExecucao) {
-        String nomeArquivo = "matricula_sequencial.txt";
-        try (FileWriter writer = new FileWriter(nomeArquivo, true)) {
-            writer.write(matricula + "\t" + tempoExecucao + "\t" + numComparacoes + "\n");
-        } catch (IOException e) {
-            e.printStackTrace();
+    private static void quicksort(int esq, int dir, int k, List<PokemonQ18> poke) {
+        int i = esq, j = dir;
+        PokemonQ18 pivo = poke.get((dir + esq) / 2); // Obter o pivô
+
+        while (i <= j) {
+            // Comparação pela geração
+            while (poke.get(i).getGeneration() < pivo.getGeneration() ||
+                    (poke.get(i).getGeneration() == pivo.getGeneration()
+                            && poke.get(i).getName().compareTo(pivo.getName()) < 0)) {
+                i++;
+            }
+            while (poke.get(j).getGeneration() > pivo.getGeneration() ||
+                    (poke.get(j).getGeneration() == pivo.getGeneration()
+                            && poke.get(j).getName().compareTo(pivo.getName()) > 0)) {
+                j--;
+            }
+            if (i <= j) {
+                // Troca de elementos
+                PokemonQ18 temp = poke.get(i);
+                poke.set(i, poke.get(j));
+                poke.set(j, temp);
+                i++;
+                j--;
+            }
+        }
+        if (esq < j) {
+            quicksort(esq, j, k, poke);
+        }
+        if (i < k && i < dir) {
+            quicksort(i, dir, k, poke);
         }
     }
 
@@ -274,8 +284,8 @@ public class Q3 {
         String entrada;
         // String path = "pokemon.csv";
         String path = "/tmp/pokemon.csv";
-        List<PokemonQ3> listaPokemon = new ArrayList<>();
-        List<PokemonQ3> listaImpressao = new ArrayList<>();
+        List<PokemonQ18> listaPokemon = new ArrayList<>();
+        List<PokemonQ18> listaImpressao = new ArrayList<>();
         boolean isFim = false;
 
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
@@ -284,7 +294,7 @@ public class Q3 {
 
             while ((linha = br.readLine()) != null) {
                 // System.out.println(linha);
-                PokemonQ3 j = new PokemonQ3();
+                PokemonQ18 j = new PokemonQ18();
                 j.ler(linha);
                 listaPokemon.add(j);
             }
@@ -304,27 +314,11 @@ public class Q3 {
             }
         }
 
-        // entrada = scanner.nextLine();
-        isFim = false;
+        sort(listaImpressao, 10);
 
-        long inicioB = System.nanoTime();
-        while (!isFim) {
-            entrada = scanner.nextLine();
-            if (entrada.equals("FIM"))
-                isFim = true;
-
-            if (!isFim) {
-
-                String resp = (pesqSeq(listaImpressao, entrada)) ? "SIM" : "NAO";
-                System.out.println(resp);
-            }
-
+        for (int i = 0; i < 10; i++) {
+            listaImpressao.get(i).imprimir();
         }
-        long fimB = System.nanoTime();
-
-        long tempoExecucao = Duration.ofNanos(fimB - inicioB).toMillis();
-
-        registrarLog(1528647, tempoExecucao);
 
         scanner.close();
     }

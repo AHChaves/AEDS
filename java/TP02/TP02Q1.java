@@ -29,7 +29,7 @@ class Pokemon {
         this.height = 0;
         this.captureRate = 0;
         this.isLegendary = false;
-        this.captureDate.of(0, 1, 1);
+        LocalDate.of(0, 1, 1);
     }
 
     public Pokemon(int id, int generation, String name, String description, List<String> type, List<String> abilities,
@@ -228,7 +228,7 @@ class Pokemon {
     }
 }
 
-public class Q1 {
+public class TP02Q1 {
 
     public static Pokemon buscarPorId(List<Pokemon> lista, int id) {
         Pokemon pk = new Pokemon();

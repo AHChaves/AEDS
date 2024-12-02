@@ -347,7 +347,7 @@ class Lista {
     }
 }
 
-public class Q1 {
+public class TP03Q1 {
 
     public static PokemonQ1 buscarPorId(List<PokemonQ1> lista, int id) {
         PokemonQ1 pk = new PokemonQ1();

@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-class PokemonQ13 {
+class PokemonQ9TP03 {
     private int id;
     private int generation;
     private String name;
@@ -22,7 +22,7 @@ class PokemonQ13 {
     private boolean isLegendary;
     private LocalDate captureDate;
 
-    public PokemonQ13() {
+    public PokemonQ9TP03() {
         this.id = 0;
         this.generation = 0;
         this.name = "";
@@ -31,11 +31,10 @@ class PokemonQ13 {
         this.height = 0;
         this.captureRate = 0;
         this.isLegendary = false;
-        this.captureDate.of(0, 1, 1);
+        LocalDate.of(0, 1, 1);
     }
 
-    public PokemonQ13(int id, int generation, String name, String description, List<String> type,
-            List<String> abilities,
+    public PokemonQ9TP03(int id, int generation, String name, String description, List<String> type, List<String> abilities,
             double weight, double height, int captureRate, boolean isLegendary, LocalDate captureDate) {
         this.id = id;
         this.generation = generation;
@@ -214,8 +213,8 @@ class PokemonQ13 {
                 + this.isLegendary + " - " + this.generation + " gen] - " + this.captureDate.format(formatter));
     }
 
-    public PokemonQ13 clone() {
-        PokemonQ13 pokemon = new PokemonQ13();
+    public PokemonQ9TP03 clone() {
+        PokemonQ9TP03 pokemon = new PokemonQ9TP03();
         pokemon.id = this.id;
         pokemon.generation = this.generation;
         pokemon.name = this.name;
@@ -231,13 +230,13 @@ class PokemonQ13 {
     }
 }
 
-public class Q13 {
+public class TP02Q9 {
 
     private static int numComparacoes = 0, numMovimentacoes = 0;
 
-    public static PokemonQ13 buscarPorId(List<PokemonQ13> lista, int id) {
-        PokemonQ13 pk = new PokemonQ13();
-        for (PokemonQ13 j : lista) {
+    public static PokemonQ9TP03 buscarPorId(List<PokemonQ9TP03> lista, int id) {
+        PokemonQ9TP03 pk = new PokemonQ9TP03();
+        for (PokemonQ9TP03 j : lista) {
             if (j.getId() == id) {
                 pk = j.clone();
             }
@@ -245,81 +244,87 @@ public class Q13 {
         return pk;
     }
 
-    public static void sort(List<PokemonQ13> poke) {
-        mergesort(0, poke.size() - 1, poke);
-    }
+    public static void sort(List<PokemonQ9TP03> poke) {
+        int n = poke.size();
 
-    private static void mergesort(int esq, int dir, List<PokemonQ13> poke) {
-        if (esq < dir) {
-            int meio = (esq + dir) / 2;
-            mergesort(esq, meio, poke);
-            mergesort(meio + 1, dir, poke);
-            intercalar(esq, meio, dir, poke);
+        PokemonQ9TP03[] array = new PokemonQ9TP03[n + 1]; // Ajustando o vetor para n+1
+        for (int i = 0; i < n; i++) {
+            array[i + 1] = poke.get(i); // Começando a partir do índice 1
+        }
+
+        // Construção do heap
+        for (int tamHeap = 2; tamHeap <= n; tamHeap++) {
+            construir(array, tamHeap);
+        }
+
+        // Ordenação propriamente dita
+        int tamHeap = n;
+        while (tamHeap > 1) {
+            swap(array, 1, tamHeap--);
+
+            reconstruir(array, tamHeap);
+        }
+
+        // Alterar o vetor para voltar à posição zero
+        for (int i = 0; i < n; i++) {
+            poke.set(i, array[i + 1]); // Ajusta de volta para o índice 0
         }
     }
 
-    private static void intercalar(int esq, int meio, int dir, List<PokemonQ13> poke) {
-        int n1 = meio - esq + 1;
-        int n2 = dir - meio;
-
-        List<PokemonQ13> esquerda = new ArrayList<>(n1);
-        List<PokemonQ13> direita = new ArrayList<>(n2);
-
-        for (int i = 0; i < n1; i++) {
-            esquerda.add(poke.get(esq + i));
-        }
-        for (int j = 0; j < n2; j++) {
-            direita.add(poke.get(meio + 1 + j));
-        }
-
-        int i = 0, j = 0, k = esq;
-
-        while (i < n1 && j < n2) {
-            int comp = comparePokemon(esquerda.get(i), direita.get(j));
-
+    public static void construir(PokemonQ9TP03[] array, int tamHeap) {
+        for (int i = tamHeap; i > 1 && compare(array[i], array[i / 2]) > 0; i /= 2) {
             numComparacoes++;
-            numMovimentacoes++;
-            if (comp <= 0) {
-                poke.set(k, esquerda.get(i));
-                i++;
+            swap(array, i, i / 2);
+            numMovimentacoes += 3;
+        }
+    }
+
+    public static void reconstruir(PokemonQ9TP03[] array, int tamHeap) {
+        int i = 1;
+        while (i <= (tamHeap / 2)) {
+            int filho = getMaiorFilho(array, i, tamHeap);
+            numComparacoes++;
+
+            if (compare(array[i], array[filho]) < 0) {
+                swap(array, i, filho);
+                numMovimentacoes += 3;
+                i = filho;
             } else {
-                poke.set(k, direita.get(j));
-                j++;
+                i = tamHeap;
             }
-            k++;
-        }
-
-        while (i < n1) {
-            numMovimentacoes++;
-            poke.set(k, esquerda.get(i));
-            i++;
-            k++;
-        }
-
-        while (j < n2) {
-            numMovimentacoes++;
-            poke.set(k, direita.get(j));
-            j++;
-            k++;
         }
     }
 
-    private static int comparePokemon(PokemonQ13 p1, PokemonQ13 p2) {
-        int typeComparison = p1.getType().get(0).compareTo(p2.getType().get(0));
-        int retorno;
+    public static int getMaiorFilho(PokemonQ9TP03[] array, int i, int tamHeap) {
+        int filho;
         numComparacoes++;
-        if (typeComparison != 0) {
-            retorno = typeComparison;
-        } else {
-            retorno = p1.getName().compareTo(p2.getName());
-            numComparacoes++;
-        }
 
-        return retorno;
+        if (2 * i == tamHeap || compare(array[2 * i], array[2 * i + 1]) > 0) {
+            filho = 2 * i;
+        } else {
+            filho = 2 * i + 1;
+        }
+        return filho;
+    }
+
+    public static void swap(PokemonQ9TP03[] array, int i, int j) {
+        PokemonQ9TP03 temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+
+    public static int compare(PokemonQ9TP03 p1, PokemonQ9TP03 p2) {
+        if (p1.getHeight() > p2.getHeight()) {
+            return 1;
+        } else if (p1.getHeight() < p2.getHeight()) {
+            return -1;
+        } else {
+            return p1.getName().compareTo(p2.getName());
+        }
     }
 
     public static void registrarLog(int matricula, long tempoExecucao) {
-        String nomeArquivo = "matrícula_mergesort.txt";
+        String nomeArquivo = "matrícula_heapsort.txt";
         try (FileWriter writer = new FileWriter(nomeArquivo, true)) {
             writer.write(matricula + "\t" + numComparacoes + "\t" + numMovimentacoes + "\t" + tempoExecucao + "\t");
         } catch (IOException e) {
@@ -333,8 +338,8 @@ public class Q13 {
         String entrada;
         // String path = "pokemon.csv";
         String path = "/tmp/pokemon.csv";
-        List<PokemonQ13> listaPokemon = new ArrayList<>();
-        List<PokemonQ13> listaImpressao = new ArrayList<>();
+        List<PokemonQ9TP03> listaPokemon = new ArrayList<>();
+        List<PokemonQ9TP03> listaImpressao = new ArrayList<>();
         boolean isFim = false;
 
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
@@ -343,7 +348,7 @@ public class Q13 {
 
             while ((linha = br.readLine()) != null) {
                 // System.out.println(linha);
-                PokemonQ13 j = new PokemonQ13();
+                PokemonQ9TP03 j = new PokemonQ9TP03();
                 j.ler(linha);
                 listaPokemon.add(j);
             }
@@ -369,7 +374,7 @@ public class Q13 {
         long tempoExecucao = Duration.ofNanos(fimB - inicioB).toMillis();
         registrarLog(1528647, tempoExecucao);
 
-        for (PokemonQ13 p : listaImpressao) {
+        for (PokemonQ9TP03 p : listaImpressao) {
             p.imprimir();
         }
 

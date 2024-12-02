@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-class PokemonQ11 {
+class PokemonQ5 {
     private int id;
     private int generation;
     private String name;
@@ -22,7 +22,7 @@ class PokemonQ11 {
     private boolean isLegendary;
     private LocalDate captureDate;
 
-    public PokemonQ11() {
+    public PokemonQ5() {
         this.id = 0;
         this.generation = 0;
         this.name = "";
@@ -31,11 +31,10 @@ class PokemonQ11 {
         this.height = 0;
         this.captureRate = 0;
         this.isLegendary = false;
-        this.captureDate.of(0, 1, 1);
+        LocalDate.of(0, 1, 1);
     }
 
-    public PokemonQ11(int id, int generation, String name, String description, List<String> type,
-            List<String> abilities,
+    public PokemonQ5(int id, int generation, String name, String description, List<String> type, List<String> abilities,
             double weight, double height, int captureRate, boolean isLegendary, LocalDate captureDate) {
         this.id = id;
         this.generation = generation;
@@ -214,8 +213,8 @@ class PokemonQ11 {
                 + this.isLegendary + " - " + this.generation + " gen] - " + this.captureDate.format(formatter));
     }
 
-    public PokemonQ11 clone() {
-        PokemonQ11 pokemon = new PokemonQ11();
+    public PokemonQ5 clone() {
+        PokemonQ5 pokemon = new PokemonQ5();
         pokemon.id = this.id;
         pokemon.generation = this.generation;
         pokemon.name = this.name;
@@ -231,13 +230,13 @@ class PokemonQ11 {
     }
 }
 
-public class Q11 {
+public class TP02Q5 {
 
     private static int numComparacoes = 0, numMovimentacoes = 0;
 
-    public static PokemonQ11 buscarPorId(List<PokemonQ11> lista, int id) {
-        PokemonQ11 pk = new PokemonQ11();
-        for (PokemonQ11 j : lista) {
+    public static PokemonQ5 buscarPorId(List<PokemonQ5> lista, int id) {
+        PokemonQ5 pk = new PokemonQ5();
+        for (PokemonQ5 j : lista) {
             if (j.getId() == id) {
                 pk = j.clone();
             }
@@ -245,69 +244,26 @@ public class Q11 {
         return pk;
     }
 
-    public static void sort(List<PokemonQ11> poke) {
-        int maiorCaptureRate = getMaiorCaptureRate(poke);
-        int[] count = new int[maiorCaptureRate + 1];
-        PokemonQ11[] ordenado = new PokemonQ11[poke.size()];
+    public static void sort(List<PokemonQ5> poke) {
+        int n = poke.size();
 
-        for (int i = 0; i < count.length; i++) {
-            count[i] = 0;
-        }
-
-        for (PokemonQ11 pokemon : poke) {
-            count[pokemon.getCaptureRate()]++;
-        }
-
-        for (int i = 1; i < count.length; i++) {
-            count[i] += count[i - 1];
-        }
-
-        for (int i = poke.size() - 1; i >= 0; i--) {
-            PokemonQ11 pokemon = poke.get(i);
-            int captureRate = pokemon.getCaptureRate();
-            ordenado[count[captureRate] - 1] = pokemon;
-            numMovimentacoes++;
-            count[captureRate]--;
-        }
-
-        for (int i = 0; i < poke.size(); i++) {
-            poke.set(i, ordenado[i]);
-            numMovimentacoes++;
-        }
-
-        ordenarPorNomeEmCasoDeEmpate(poke);
-    }
-
-    public static void ordenarPorNomeEmCasoDeEmpate(List<PokemonQ11> poke) {
-        for (int i = 0; i < poke.size() - 1; i++) {
-            for (int j = i + 1; j < poke.size(); j++) {
-                if (poke.get(i).getCaptureRate() == poke.get(j).getCaptureRate()) {
-                    if (poke.get(i).getName().compareToIgnoreCase(poke.get(j).getName()) > 0) {
-                        PokemonQ11 temp = poke.get(i);
-                        poke.set(i, poke.get(j));
-                        poke.set(j, temp);
-                        numMovimentacoes += 3;
-                    }
+        for (int i = 0; i < (n - 1); i++) {
+            int menor = i;
+            for (int j = (i + 1); j < n; j++) {
+                if (poke.get(menor).getName().compareTo(poke.get(j).getName()) > 0) {
+                    menor = j;
                     numComparacoes++;
                 }
-                numComparacoes++;
             }
+            PokemonQ5 temp = poke.get(menor);
+            poke.set(menor, poke.get(i));
+            poke.set(i, temp);
+            numMovimentacoes += 3;
         }
-    }
-
-    public static int getMaiorCaptureRate(List<PokemonQ11> poke) {
-        int maior = poke.get(0).getCaptureRate();
-        for (PokemonQ11 pokemon : poke) {
-            if (pokemon.getCaptureRate() > maior) {
-                maior = pokemon.getCaptureRate();
-            }
-            numComparacoes++;
-        }
-        return maior;
     }
 
     public static void registrarLog(int matricula, long tempoExecucao) {
-        String nomeArquivo = "matrícula_countingsort.txt";
+        String nomeArquivo = "matrícula_selecao.txt";
         try (FileWriter writer = new FileWriter(nomeArquivo, true)) {
             writer.write(matricula + "\t" + numComparacoes + "\t" + numMovimentacoes + "\t" + tempoExecucao + "\t");
         } catch (IOException e) {
@@ -319,10 +275,10 @@ public class Q11 {
 
         Scanner scanner = new Scanner(System.in);
         String entrada;
-        // String path = "pokemon.csv";
-        String path = "/tmp/pokemon.csv";
-        List<PokemonQ11> listaPokemon = new ArrayList<>();
-        List<PokemonQ11> listaImpressao = new ArrayList<>();
+        String path = "pokemon.csv";
+        // String path = "/tmp/pokemon.csv";
+        List<PokemonQ5> listaPokemon = new ArrayList<>();
+        List<PokemonQ5> listaImpressao = new ArrayList<>();
         boolean isFim = false;
 
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
@@ -330,8 +286,7 @@ public class Q11 {
             String linha = br.readLine();
 
             while ((linha = br.readLine()) != null) {
-                // System.out.println(linha);
-                PokemonQ11 j = new PokemonQ11();
+                PokemonQ5 j = new PokemonQ5();
                 j.ler(linha);
                 listaPokemon.add(j);
             }
@@ -350,14 +305,13 @@ public class Q11 {
                 listaImpressao.add(buscarPorId(listaPokemon, id));
             }
         }
-
         long inicioB = System.nanoTime();
         sort(listaImpressao);
         long fimB = System.nanoTime();
         long tempoExecucao = Duration.ofNanos(fimB - inicioB).toMillis();
         registrarLog(1528647, tempoExecucao);
 
-        for (PokemonQ11 p : listaImpressao) {
+        for (PokemonQ5 p : listaImpressao) {
             p.imprimir();
         }
 

@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-class PokemonQ7 {
+class PokemonQ3 {
     private int id;
     private int generation;
     private String name;
@@ -22,7 +22,7 @@ class PokemonQ7 {
     private boolean isLegendary;
     private LocalDate captureDate;
 
-    public PokemonQ7() {
+    public PokemonQ3() {
         this.id = 0;
         this.generation = 0;
         this.name = "";
@@ -31,10 +31,10 @@ class PokemonQ7 {
         this.height = 0;
         this.captureRate = 0;
         this.isLegendary = false;
-        this.captureDate.of(0, 1, 1);
+        LocalDate.of(0, 1, 1);
     }
 
-    public PokemonQ7(int id, int generation, String name, String description, List<String> type, List<String> abilities,
+    public PokemonQ3(int id, int generation, String name, String description, List<String> type, List<String> abilities,
             double weight, double height, int captureRate, boolean isLegendary, LocalDate captureDate) {
         this.id = id;
         this.generation = generation;
@@ -213,8 +213,8 @@ class PokemonQ7 {
                 + this.isLegendary + " - " + this.generation + " gen] - " + this.captureDate.format(formatter));
     }
 
-    public PokemonQ7 clone() {
-        PokemonQ7 pokemon = new PokemonQ7();
+    public PokemonQ3 clone() {
+        PokemonQ3 pokemon = new PokemonQ3();
         pokemon.id = this.id;
         pokemon.generation = this.generation;
         pokemon.name = this.name;
@@ -230,13 +230,13 @@ class PokemonQ7 {
     }
 }
 
-public class Q7 {
+public class TP02Q3 {
 
-    private static int numComparacoes = 0, numMovimentacoes = 0;
+    private static int numComparacoes = 0;
 
-    public static PokemonQ7 buscarPorId(List<PokemonQ7> lista, int id) {
-        PokemonQ7 pk = new PokemonQ7();
-        for (PokemonQ7 j : lista) {
+    public static PokemonQ3 buscarPorId(List<PokemonQ3> lista, int id) {
+        PokemonQ3 pk = new PokemonQ3();
+        for (PokemonQ3 j : lista) {
             if (j.getId() == id) {
                 pk = j.clone();
             }
@@ -244,28 +244,25 @@ public class Q7 {
         return pk;
     }
 
-    public static void sort(List<PokemonQ7> poke) {
+    public static boolean pesqSeq(List<PokemonQ3> poke, String name) {
+        boolean resp = false;
         int n = poke.size();
 
-        for (int i = 1; i < n; i++) {
-            PokemonQ7 tmp = poke.get(i);
-            int j = i - 1;
-
-            while ((j >= 0) && (poke.get(j).getCaptureDate().isAfter(tmp.getCaptureDate()))) {
-                poke.set(j + 1, poke.get(j));
-                j--;
-                numMovimentacoes++;
-                numComparacoes++;
+        for (int i = 0; i < n; i++) {
+            String pokeName = poke.get(i).getName();
+            numComparacoes++;
+            if (pokeName.equals(name)) {
+                resp = true;
+                i = n;
             }
-            poke.set(j + 1, tmp);
-            numMovimentacoes++;
         }
+        return resp;
     }
 
     public static void registrarLog(int matricula, long tempoExecucao) {
-        String nomeArquivo = "matrícula_insercao.txt";
+        String nomeArquivo = "matricula_sequencial.txt";
         try (FileWriter writer = new FileWriter(nomeArquivo, true)) {
-            writer.write(matricula + "\t" + numComparacoes + "\t" + numMovimentacoes + "\t" + tempoExecucao + "\t");
+            writer.write(matricula + "\t" + tempoExecucao + "\t" + numComparacoes + "\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -277,8 +274,8 @@ public class Q7 {
         String entrada;
         // String path = "pokemon.csv";
         String path = "/tmp/pokemon.csv";
-        List<PokemonQ7> listaPokemon = new ArrayList<>();
-        List<PokemonQ7> listaImpressao = new ArrayList<>();
+        List<PokemonQ3> listaPokemon = new ArrayList<>();
+        List<PokemonQ3> listaImpressao = new ArrayList<>();
         boolean isFim = false;
 
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
@@ -286,7 +283,8 @@ public class Q7 {
             String linha = br.readLine();
 
             while ((linha = br.readLine()) != null) {
-                PokemonQ7 j = new PokemonQ7();
+                // System.out.println(linha);
+                PokemonQ3 j = new PokemonQ3();
                 j.ler(linha);
                 listaPokemon.add(j);
             }
@@ -306,15 +304,27 @@ public class Q7 {
             }
         }
 
-        long inicioB = System.nanoTime();
-        sort(listaImpressao);
-        long fimB = System.nanoTime();
-        long tempoExecucao = Duration.ofNanos(fimB - inicioB).toMillis();
-        registrarLog(1528647, tempoExecucao);
+        // entrada = scanner.nextLine();
+        isFim = false;
 
-        for (PokemonQ7 p : listaImpressao) {
-            p.imprimir();
+        long inicioB = System.nanoTime();
+        while (!isFim) {
+            entrada = scanner.nextLine();
+            if (entrada.equals("FIM"))
+                isFim = true;
+
+            if (!isFim) {
+
+                String resp = (pesqSeq(listaImpressao, entrada)) ? "SIM" : "NAO";
+                System.out.println(resp);
+            }
+
         }
+        long fimB = System.nanoTime();
+
+        long tempoExecucao = Duration.ofNanos(fimB - inicioB).toMillis();
+
+        registrarLog(1528647, tempoExecucao);
 
         scanner.close();
     }

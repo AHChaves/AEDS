@@ -1,15 +1,13 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-class PokemonQ5 {
+class PokemonQ10 {
     private int id;
     private int generation;
     private String name;
@@ -22,7 +20,7 @@ class PokemonQ5 {
     private boolean isLegendary;
     private LocalDate captureDate;
 
-    public PokemonQ5() {
+    public PokemonQ10() {
         this.id = 0;
         this.generation = 0;
         this.name = "";
@@ -31,10 +29,11 @@ class PokemonQ5 {
         this.height = 0;
         this.captureRate = 0;
         this.isLegendary = false;
-        this.captureDate.of(0, 1, 1);
+        this.captureDate = LocalDate.of(0, 1, 1);
     }
 
-    public PokemonQ5(int id, int generation, String name, String description, List<String> type, List<String> abilities,
+    public PokemonQ10(int id, int generation, String name, String description, List<String> type,
+            List<String> abilities,
             double weight, double height, int captureRate, boolean isLegendary, LocalDate captureDate) {
         this.id = id;
         this.generation = generation;
@@ -213,8 +212,8 @@ class PokemonQ5 {
                 + this.isLegendary + " - " + this.generation + " gen] - " + this.captureDate.format(formatter));
     }
 
-    public PokemonQ5 clone() {
-        PokemonQ5 pokemon = new PokemonQ5();
+    public PokemonQ10 clone() {
+        PokemonQ10 pokemon = new PokemonQ10();
         pokemon.id = this.id;
         pokemon.generation = this.generation;
         pokemon.name = this.name;
@@ -230,13 +229,100 @@ class PokemonQ5 {
     }
 }
 
-public class Q5 {
+// --------------------------------------------------------- Inicio da
+// implementacao de Pilha ------------------------------------------
 
-    private static int numComparacoes = 0, numMovimentacoes = 0;
+class CelulaDupla {
+    public PokemonQ10 elemento;
+    public CelulaDupla ant;
+    public CelulaDupla prox;
 
-    public static PokemonQ5 buscarPorId(List<PokemonQ5> lista, int id) {
-        PokemonQ5 pk = new PokemonQ5();
-        for (PokemonQ5 j : lista) {
+    public CelulaDupla() {
+        elemento = new PokemonQ10();
+    }
+
+    public CelulaDupla(PokemonQ10 elemento) {
+        this.elemento = elemento;
+        this.ant = this.prox = null;
+    }
+}
+
+class ListaDupla {
+    public CelulaDupla primeiro;
+    public CelulaDupla ultimo;
+
+    public ListaDupla() {
+        primeiro = new CelulaDupla();
+        ultimo = primeiro;
+    }
+
+    public void inserirFim(PokemonQ10 x) {
+        ultimo.prox = new CelulaDupla(x);
+        ultimo.prox.ant = ultimo;
+        ultimo = ultimo.prox;
+    }
+
+    public void mostrar() {
+
+        for (CelulaDupla i = primeiro.prox; i != null; i = i.prox) {
+            i.elemento.imprimir();
+        }
+    }
+}
+// --------------------------------------------------------- Fim da
+// implementacao de Pilha --------------------------------------------
+
+class Quicksort {
+
+    public void sort(ListaDupla lista) {
+        quicksort(lista, lista.primeiro.prox, lista.ultimo);
+    }
+
+    private void quicksort(ListaDupla lista, CelulaDupla esq, CelulaDupla dir) {
+        if (esq != null && dir != null && esq != dir && esq != dir.prox) {
+            CelulaDupla pivo = partition(lista, esq, dir);
+            quicksort(lista, esq, pivo.ant);
+            quicksort(lista, pivo.prox, dir);
+        }
+    }
+
+    private CelulaDupla partition(ListaDupla lista, CelulaDupla esq, CelulaDupla dir) {
+        PokemonQ10 pivo = dir.elemento;
+        CelulaDupla i = esq.ant;
+
+        for (CelulaDupla j = esq; j != dir; j = j.prox) {
+            if (comparaPokemon(j.elemento, pivo) <= 0) {
+                i = (i == null) ? esq : i.prox;
+                swap(i, j);
+            }
+        }
+
+        i = (i == null) ? esq : i.prox;
+        swap(i, dir);
+        return i;
+    }
+
+    private int comparaPokemon(PokemonQ10 a, PokemonQ10 b) {
+        if (a.getGeneration() < b.getGeneration()) {
+            return -1;
+        } else if (a.getGeneration() > b.getGeneration()) {
+            return 1;
+        }
+        return a.getName().compareTo(b.getName());
+    }
+
+    private void swap(CelulaDupla a, CelulaDupla b) {
+        PokemonQ10 temp = a.elemento;
+        a.elemento = b.elemento;
+        b.elemento = temp;
+    }
+}
+
+public class TP03Q10 {
+
+    public static PokemonQ10 buscarPorId(List<PokemonQ10> lista, int id) {
+        PokemonQ10 pk = new PokemonQ10();
+        for (PokemonQ10 j : lista) {
             if (j.getId() == id) {
                 pk = j.clone();
             }
@@ -244,49 +330,21 @@ public class Q5 {
         return pk;
     }
 
-    public static void sort(List<PokemonQ5> poke) {
-        int n = poke.size();
-
-        for (int i = 0; i < (n - 1); i++) {
-            int menor = i;
-            for (int j = (i + 1); j < n; j++) {
-                if (poke.get(menor).getName().compareTo(poke.get(j).getName()) > 0) {
-                    menor = j;
-                    numComparacoes++;
-                }
-            }
-            PokemonQ5 temp = poke.get(menor);
-            poke.set(menor, poke.get(i));
-            poke.set(i, temp);
-            numMovimentacoes += 3;
-        }
-    }
-
-    public static void registrarLog(int matricula, long tempoExecucao) {
-        String nomeArquivo = "matrícula_selecao.txt";
-        try (FileWriter writer = new FileWriter(nomeArquivo, true)) {
-            writer.write(matricula + "\t" + numComparacoes + "\t" + numMovimentacoes + "\t" + tempoExecucao + "\t");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public static void main(String[] args) {
 
         Scanner scanner = new Scanner(System.in);
         String entrada;
-        String path = "pokemon.csv";
-        // String path = "/tmp/pokemon.csv";
-        List<PokemonQ5> listaPokemon = new ArrayList<>();
-        List<PokemonQ5> listaImpressao = new ArrayList<>();
+        // String path = "pokemon.csv";
+        String path = "/tmp/pokemon.csv";
+        List<PokemonQ10> listaPokemon = new ArrayList<>();
+        ListaDupla listaImpressao = new ListaDupla();
         boolean isFim = false;
 
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
 
             String linha = br.readLine();
-
             while ((linha = br.readLine()) != null) {
-                PokemonQ5 j = new PokemonQ5();
+                PokemonQ10 j = new PokemonQ10();
                 j.ler(linha);
                 listaPokemon.add(j);
             }
@@ -302,18 +360,18 @@ public class Q5 {
 
             if (!isFim) {
                 int id = Integer.parseInt(entrada);
-                listaImpressao.add(buscarPorId(listaPokemon, id));
+                try {
+                    listaImpressao.inserirFim(buscarPorId(listaPokemon, id));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
-        long inicioB = System.nanoTime();
-        sort(listaImpressao);
-        long fimB = System.nanoTime();
-        long tempoExecucao = Duration.ofNanos(fimB - inicioB).toMillis();
-        registrarLog(1528647, tempoExecucao);
 
-        for (PokemonQ5 p : listaImpressao) {
-            p.imprimir();
-        }
+        Quicksort quicksort = new Quicksort();
+        quicksort.sort(listaImpressao);
+
+        listaImpressao.mostrar();
 
         scanner.close();
     }

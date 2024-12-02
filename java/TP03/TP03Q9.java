@@ -298,7 +298,7 @@ class Pilha {
 // --------------------------------------------------------- Fim da
 // implementacao de Pilha --------------------------------------------
 
-public class Q9 {
+public class TP03Q9 {
 
     public static PokemonQ9 buscarPorId(List<PokemonQ9> lista, int id) {
         PokemonQ9 pk = new PokemonQ9();
