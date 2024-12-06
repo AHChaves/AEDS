@@ -1,6 +1,8 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -284,13 +286,15 @@ class HashRE {
         return resp;
     }
 
-    public int pesquisar(PokemonQ06 elemento) {
+    public int pesquisar(PokemonQ06 elemento, int cmp) {
         int resp = -1;
         int pos = h(getSumASCII(elemento.getName()));
         if (tabela[pos].getName().compareTo(elemento.getName()) == 0) {
+            cmp++;
             resp = pos;
         } else if (tabela[pos].getId() != -1) {
             pos = reh(getSumASCII(elemento.getName()));
+            cmp++;
             if (tabela[pos].getName().compareTo(elemento.getName()) == 0) {
                 resp = pos;
             }
@@ -303,6 +307,8 @@ class HashRE {
 // ---------------------------------------------------
 
 public class Q06 {
+
+    private static int numComparacoes = 0, numMovimentacoes = 0;
 
     public static PokemonQ06 buscarPorId(List<PokemonQ06> lista, int id) {
         PokemonQ06 pk = new PokemonQ06();
@@ -322,6 +328,15 @@ public class Q06 {
             }
         }
         return pk;
+    }
+
+    public static void registrarLog(int matricula, long tempoExecucao) {
+        String nomeArquivo = "matrícula_hashRehash.txt";
+        try (FileWriter writer = new FileWriter(nomeArquivo, true)) {
+            writer.write(matricula + "\t" + numComparacoes + "\t" + numMovimentacoes + "\t" + tempoExecucao + "\t");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {
@@ -363,6 +378,8 @@ public class Q06 {
         }
         isFim = false;
 
+        long inicioB = System.nanoTime();
+
         while (!isFim) {
             entrada = scanner.nextLine();
 
@@ -372,13 +389,18 @@ public class Q06 {
             if (!isFim) {
                 try {
                     System.out.print("=> " + entrada + ": ");
-                    int achou = hashImpressao.pesquisar(buscarPorNome(listaPokemon, entrada));
+                    int achou = hashImpressao.pesquisar(buscarPorNome(listaPokemon, entrada), numComparacoes);
                     System.out.println((achou != -1) ? "(Posicao: " + achou + ") SIM" : "NAO");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }
+
+        long fimB = System.nanoTime();
+
+        long tempoExecucao = Duration.ofNanos(fimB - inicioB).toMillis();
+        registrarLog(1528647, tempoExecucao);
 
         scanner.close();
     }

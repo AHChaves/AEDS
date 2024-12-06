@@ -1,6 +1,8 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -274,22 +276,24 @@ class ArvoreBinaria {
         raiz = null;
     }
 
-    public boolean pesquisar(String nome) {
-        return pesquisar(nome, raiz);
+    public boolean pesquisar(String nome, int cmp) {
+        return pesquisar(nome, raiz, cmp);
     }
 
-    private boolean pesquisar(String nome, No i) {
+    private boolean pesquisar(String nome, No i, int cmp) {
         boolean resp;
         if (i == null) {
             resp = false;
         } else if (nome.equals(i.pokemon.getName())) {
+            cmp++;
             resp = true;
         } else if (nome.compareTo(i.pokemon.getName()) < 0) {
+            cmp++;
             System.out.print("esq ");
-            resp = pesquisar(nome, i.esq);
+            resp = pesquisar(nome, i.esq, cmp);
         } else {
             System.out.print("dir ");
-            resp = pesquisar(nome, i.dir);
+            resp = pesquisar(nome, i.dir, cmp);
         }
         return resp;
     }
@@ -320,30 +324,31 @@ class ArvoreDupla {
         raiz = null;
     }
 
-    public boolean pesquisar(String poke) {
+    public boolean pesquisar(String poke, int cmp) {
         System.out.print("raiz ");
-        return pesquisar(poke, raiz);
+        return pesquisar(poke, raiz, cmp);
     }
 
-    private boolean pesquisar(String nome, NoDuplo i) {
+    private boolean pesquisar(String nome, NoDuplo i, int cmp) {
 
         if (i == null) {
-            return false; // Retorna falso se o nó atual for nulo
+            return false;
         }
 
-        // Pesquisar na árvore binária associada ao nó atual
-        if (i.arvorePokemon.pesquisar(nome)) {
-            return true; // Retorna verdadeiro se o Pokémon for encontrado
+        if (i.arvorePokemon.pesquisar(nome, cmp)) {
+            cmp++;
+            return true;
         }
 
         // Continuar pesquisando na subárvore esquerda e direita do nó atual
         System.out.print(" ESQ ");
-        if (pesquisar(nome, i.esq)) {
+        if (pesquisar(nome, i.esq, cmp)) {
+            cmp++;
             return true;
         }
 
         System.out.print(" DIR ");
-        return pesquisar(nome, i.dir);
+        return pesquisar(nome, i.dir, cmp);
     }
 
     public void inserir(int x) throws Exception {
@@ -388,6 +393,8 @@ class ArvoreDupla {
 
 public class Q02 {
 
+    private static int numComparacoes = 0, numMovimentacoes = 0;
+
     public static PokemonQ02 buscarPorId(List<PokemonQ02> lista, int id) {
         PokemonQ02 pk = new PokemonQ02();
         for (PokemonQ02 j : lista) {
@@ -406,6 +413,15 @@ public class Q02 {
             }
         }
         return pk;
+    }
+
+    public static void registrarLog(int matricula, long tempoExecucao) {
+        String nomeArquivo = "matrícula_arvoreArvore.txt";
+        try (FileWriter writer = new FileWriter(nomeArquivo, true)) {
+            writer.write(matricula + "\t" + numComparacoes + "\t" + numMovimentacoes + "\t" + tempoExecucao + "\t");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {
@@ -457,6 +473,8 @@ public class Q02 {
         }
         isFim = false;
 
+        long inicioB = System.nanoTime();
+
         while (!isFim) {
             entrada = scanner.nextLine();
 
@@ -467,13 +485,18 @@ public class Q02 {
                 try {
                     System.out.print("=> ");
                     System.out.println(entrada);
-                    boolean achou = arvoreImpressao.pesquisar(entrada);
+                    boolean achou = arvoreImpressao.pesquisar(entrada, numComparacoes);
                     System.out.println((achou) ? " SIM" : " NAO");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }
+
+        long fimB = System.nanoTime();
+
+        long tempoExecucao = Duration.ofNanos(fimB - inicioB).toMillis();
+        registrarLog(1528647, tempoExecucao);
 
         scanner.close();
     }

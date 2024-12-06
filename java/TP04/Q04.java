@@ -1,6 +1,8 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -263,23 +265,26 @@ class Alvinegra {
       raiz = null;
    }
 
-   public boolean pesquisar(String nome) {
+   public boolean pesquisar(String nome, int cmp) {
       System.out.print("raiz ");
-      return pesquisar(nome, raiz);
+      return pesquisar(nome, raiz, cmp);
    }
 
-   private boolean pesquisar(String nome, NoAN i) {
+   private boolean pesquisar(String nome, NoAN i, int cmp) {
       boolean resp;
       if (i == null) {
          resp = false;
       } else if (nome.equals(i.pokemon.getName())) {
          resp = true;
+         cmp++;
       } else if (nome.compareTo(i.pokemon.getName()) < 0) {
          System.out.print("esq ");
-         resp = pesquisar(nome, i.esq);
+         cmp++;
+         resp = pesquisar(nome, i.esq, cmp);
       } else {
          System.out.print("dir ");
-         resp = pesquisar(nome, i.dir);
+         cmp++;
+         resp = pesquisar(nome, i.dir, cmp);
       }
       return resp;
    }
@@ -424,6 +429,8 @@ class Alvinegra {
 
 public class Q04 {
 
+   private static int numComparacoes = 0, numMovimentacoes = 0;
+
    public static PokemonQ04 buscarPorId(List<PokemonQ04> lista, int id) {
       PokemonQ04 pk = new PokemonQ04();
       for (PokemonQ04 j : lista) {
@@ -432,6 +439,15 @@ public class Q04 {
          }
       }
       return pk;
+   }
+
+   public static void registrarLog(int matricula, long tempoExecucao) {
+      String nomeArquivo = "matrícula_avinegra.txt";
+      try (FileWriter writer = new FileWriter(nomeArquivo, true)) {
+         writer.write(matricula + "\t" + numComparacoes + "\t" + numMovimentacoes + "\t" + tempoExecucao + "\t");
+      } catch (IOException e) {
+         e.printStackTrace();
+      }
    }
 
    public static void main(String[] args) {
@@ -473,6 +489,8 @@ public class Q04 {
       }
       isFim = false;
 
+      long inicioB = System.nanoTime();
+
       while (!isFim) {
          entrada = scanner.nextLine();
 
@@ -482,13 +500,18 @@ public class Q04 {
          if (!isFim) {
             try {
                System.out.println(entrada);
-               boolean achou = arvoreImpressao.pesquisar(entrada);
+               boolean achou = arvoreImpressao.pesquisar(entrada, numComparacoes);
                System.out.println((achou) ? "SIM" : "NAO");
             } catch (Exception e) {
                e.printStackTrace();
             }
          }
       }
+
+      long fimB = System.nanoTime();
+
+      long tempoExecucao = Duration.ofNanos(fimB - inicioB).toMillis();
+      registrarLog(1528647, tempoExecucao);
 
       scanner.close();
    }

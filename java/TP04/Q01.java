@@ -1,6 +1,8 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -255,23 +257,26 @@ class ArvoreBinaria {
       raiz = null;
    }
 
-   public boolean pesquisar(String nome) {
+   public boolean pesquisar(String nome, int cmp) {
       System.out.print("raiz ");
-      return pesquisar(nome, raiz);
+      return pesquisar(nome, raiz, cmp);
    }
 
-   private boolean pesquisar(String nome, No i) {
+   private boolean pesquisar(String nome, No i, int cmp) {
       boolean resp;
       if (i == null) {
          resp = false;
       } else if (nome.equals(i.pokemon.getName())) {
+         cmp++;
          resp = true;
       } else if (nome.compareTo(i.pokemon.getName()) < 0) {
+         cmp++;
          System.out.print("esq ");
-         resp = pesquisar(nome, i.esq);
+         resp = pesquisar(nome, i.esq, cmp);
       } else {
+         cmp++;
          System.out.print("dir ");
-         resp = pesquisar(nome, i.dir);
+         resp = pesquisar(nome, i.dir, cmp);
       }
       return resp;
    }
@@ -293,53 +298,14 @@ class ArvoreBinaria {
 
       return i;
    }
-
-   public void remover(String nome) throws Exception {
-      raiz = remover(nome, raiz);
-   }
-
-   // Método privado recursivo para remover Pokémon pelo nome.
-   private No remover(String nome, No i) throws Exception {
-
-      if (i == null) {
-         throw new Exception("Erro ao remover: Pokémon não encontrado!");
-
-      } else if (nome.compareTo(i.pokemon.getName()) < 0) {
-         i.esq = remover(nome, i.esq);
-
-      } else if (nome.compareTo(i.pokemon.getName()) > 0) {
-         i.dir = remover(nome, i.dir);
-
-      } else if (i.dir == null) {
-         i = i.esq;
-
-      } else if (i.esq == null) {
-         i = i.dir;
-
-      } else {
-         i.esq = antecessor(i, i.esq);
-      }
-
-      return i;
-   }
-
-   private No antecessor(No i, No j) {
-      if (j.dir != null) {
-         j.dir = antecessor(i, j.dir);
-
-      } else {
-         i.pokemon = j.pokemon;
-         j = j.esq;
-      }
-      return j;
-   }
-
 }
 
 // -------------------------------- Fim Implementacao arvore
 // ---------------------------------------------------------
 
 public class Q01 {
+
+   private static int numComparacoes = 0, numMovimentacoes = 0;
 
    public static PokemonQ01 buscarPorId(List<PokemonQ01> lista, int id) {
       PokemonQ01 pk = new PokemonQ01();
@@ -349,6 +315,15 @@ public class Q01 {
          }
       }
       return pk;
+   }
+
+   public static void registrarLog(int matricula, long tempoExecucao) {
+      String nomeArquivo = "matrícula_arvoreBinaria.txt";
+      try (FileWriter writer = new FileWriter(nomeArquivo, true)) {
+         writer.write(matricula + "\t" + numComparacoes + "\t" + numMovimentacoes + "\t" + tempoExecucao + "\t");
+      } catch (IOException e) {
+         e.printStackTrace();
+      }
    }
 
    public static void main(String[] args) {
@@ -390,6 +365,8 @@ public class Q01 {
       }
       isFim = false;
 
+      long inicioB = System.nanoTime();
+
       while (!isFim) {
          entrada = scanner.nextLine();
 
@@ -400,13 +377,18 @@ public class Q01 {
             try {
                System.out.println(entrada);
                System.out.print("=>");
-               boolean achou = arvoreImpressao.pesquisar(entrada);
+               boolean achou = arvoreImpressao.pesquisar(entrada, numComparacoes);
                System.out.println((achou) ? "SIM" : "NAO");
             } catch (Exception e) {
                e.printStackTrace();
             }
          }
       }
+
+      long fimB = System.nanoTime();
+
+      long tempoExecucao = Duration.ofNanos(fimB - inicioB).toMillis();
+      registrarLog(1528647, tempoExecucao);
 
       scanner.close();
    }
